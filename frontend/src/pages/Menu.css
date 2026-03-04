@@ -1,0 +1,119 @@
+ /* Menu.css — styles for Menu page */
+
+.menu-page {
+  min-height: 100vh;
+  background-color: #f9f0ff;
+}
+
+/* ── HEADER ── */
+.menu-header {
+  background: linear-gradient(135deg, #4a0080, #8b00ff);
+  color: white;
+  padding: 50px 40px;
+  text-align: center;
+}
+
+.menu-header h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+/* ── CATEGORY FILTER BUTTONS ── */
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;       /* wraps to next line if too many */
+  gap: 10px;
+  padding: 30px 40px;
+  justify-content: center;
+  background: white;
+}
+
+.filter-btn {
+  padding: 10px 20px;
+  border: 2px solid #4a0080;
+  border-radius: 25px;
+  background: transparent;
+  color: #4a0080;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover {
+  background: #4a0080;
+  color: white;
+}
+
+/* active = currently selected category */
+.filter-btn.active {
+  background: #4a0080;
+  color: white;
+}
+
+/* ── MENU GRID ── */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  padding: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.menu-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.menu-card:hover {
+  transform: translateY(-5px);
+}
+
+/* category badge at top of card */
+.menu-badge {
+  background: #f0e0ff;
+  color: #4a0080;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.menu-card h3 {
+  color: #4a0080;
+  margin: 15px 0 8px;
+  font-size: 18px;
+}
+
+.menu-card p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* price styling */
+.menu-price {
+  font-size: 22px;
+  font-weight: bold;
+  color: #4a0080;
+  margin-top: 15px;
+}
+
+.menu-price span {
+  font-size: 13px;
+  color: #888;
+  font-weight: normal;
+}
+
+/* loading message */
+.loading {
+  text-align: center;
+  padding: 100px;
+  font-size: 24px;
+  color: #4a0080;
+}

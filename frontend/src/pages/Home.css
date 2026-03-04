@@ -1,0 +1,143 @@
+ /* Home.css — styles for the Home page */
+
+/* ── HERO SECTION ── */
+.hero {
+  background: linear-gradient(135deg, #4a0080, #8b00ff);
+  color: white;
+  padding: 100px 40px;
+  text-align: center;
+}
+
+.hero-content h1 {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+
+.hero-content p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+/* Hero buttons */
+.hero-btn {
+  padding: 14px 35px;
+  margin: 10px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #f0c040;   /* yellow */
+  color: #4a0080;              /* purple text */
+  transition: transform 0.2s;
+}
+
+.hero-btn:hover {
+  transform: translateY(-3px); /* lifts up on hover */
+}
+
+/* outline button — transparent with white border */
+.hero-btn.outline {
+  background-color: transparent;
+  border: 2px solid white;
+  color: white;
+}
+
+.hero-btn.outline:hover {
+  background-color: white;
+  color: #4a0080;
+}
+
+/* ── SERVICES SECTION ── */
+.services {
+  padding: 60px 40px;
+  text-align: center;
+  background-color: #f9f0ff;
+}
+
+.services h2 {
+  font-size: 32px;
+  color: #4a0080;
+  margin-bottom: 40px;
+}
+
+/* 3 cards in a row */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.service-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s;
+}
+
+.service-card:hover {
+  transform: translateY(-5px); /* lifts up on hover */
+}
+
+.service-icon {
+  font-size: 40px;
+}
+
+.service-card h3 {
+  color: #4a0080;
+  margin: 15px 0 10px;
+  font-size: 20px;
+}
+
+/* ── WHY CHOOSE US ── */
+.why-us {
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.why-us h2 {
+  font-size: 32px;
+  color: #4a0080;
+  margin-bottom: 40px;
+}
+
+/* 3 columns grid */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.why-card {
+  background: #4a0080;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ── CALL TO ACTION ── */
+.cta {
+  background: linear-gradient(135deg, #4a0080, #8b00ff);
+  color: white;
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.cta h2 {
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.cta p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
