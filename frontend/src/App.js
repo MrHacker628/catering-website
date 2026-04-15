@@ -4,14 +4,16 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+// Import all our pages
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import Booking from './pages/Booking';
 import Payment from './pages/Payment';
 import Admin from './pages/Admin';
 
+import Navbar from './components/Navbar';
+
+// Import main CSS
 import './App.css';
 
 function App() {
@@ -56,20 +58,8 @@ const [showAuthModal, setShowAuthModal] = useState(false);
 
 
   return (
+    // BrowserRouter enables routing in our app
     <BrowserRouter>
-      <div className="app">
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/admin" element={<Admin />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
 
       {/* Navbar shows on ALL pages because it's outside Routes */}
       <Navbar currentUser={currentUser}
