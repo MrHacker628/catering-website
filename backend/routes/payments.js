@@ -87,41 +87,86 @@ router.post('/verify', function(req, res) {
 
     const { razorpay_order_id, razorpay_payment_id } = req.body;
 
-    // Update payment status to 'success' in our database
-    // and save the razorpay_payment_id we received
-    const sql = `UPDATE payments 
-                SET payment_status = 'success', 
-                razorpay_payment_id = ? 
-                WHERE razorpay_order_id = ?`;
-
-    db.query(sql, [razorpay_payment_id, razorpay_order_id], function(err, result) {
+    // STEP 1 — Start transaction
+    // Both payment update AND order update must succeed together!
+    db.beginTransaction(function(err) {
 
         if (err) {
-            console.log("❌ Error verifying payment:", err);
-            res.status(500).json({ message: "Error verifying payment" });
-        } else {
-            // Also update order status to 'confirmed'
-            const updateOrderSql = `UPDATE orders 
-                                   SET order_status = 'confirmed' 
-                                   WHERE id = (
-                                       SELECT order_id FROM payments 
-                                       WHERE razorpay_order_id = ?
-                                   )`;
+            console.log("❌ Transaction start failed:", err);
+            res.status(500).json({ message: "Server error" });
+            return;
+        }
 
-            db.query(updateOrderSql, [razorpay_order_id], function(err2, result2) {
+        console.log("🔄 Payment transaction started!");
 
-                if (err2) {
-                    console.log("❌ Error updating order:", err2);
-                } else {
+        // STEP 2 — Update payment status
+        const paymentSql = `UPDATE payments 
+                    SET payment_status = 'success', 
+                    razorpay_payment_id = ? 
+                    WHERE razorpay_order_id = ?`;
+
+        db.query(paymentSql, [razorpay_payment_id, razorpay_order_id], 
+        function(err) {
+
+            if (err) {
+                // ❌ Payment update failed — rollback!
+                db.rollback(function() {
+                    console.log("❌ Payment update failed! Rolled back!");
+                    res.status(500).json({ 
+                        message: "Payment update failed!" 
+                    });
+                });
+                return;
+            }
+
+            console.log("✅ Payment status updated!");
+
+            // STEP 3 — Update order status
+            const orderSql = `UPDATE orders 
+                            SET order_status = 'confirmed' 
+                            WHERE id = (
+                                SELECT order_id FROM payments 
+                                WHERE razorpay_order_id = ?
+                            )`;
+
+            db.query(orderSql, [razorpay_order_id], function(err) {
+
+                if (err) {
+                    // ❌ Order update failed — rollback payment too!
+                    db.rollback(function() {
+                        console.log("❌ Order update failed! Rolled back!");
+                        res.status(500).json({ 
+                            message: "Order update failed! Payment rolled back!" 
+                        });
+                    });
+                    return;
+                }
+
+                console.log("✅ Order status updated to confirmed!");
+
+                // STEP 4 — Both succeeded — commit!
+                db.commit(function(err) {
+
+                    if (err) {
+                        db.rollback(function() {
+                            console.log("❌ Commit failed! Rolled back!");
+                            res.status(500).json({ 
+                                message: "Failed to complete payment!" 
+                            });
+                        });
+                        return;
+                    }
+
+                    // 🎉 SUCCESS — both saved!
+                    console.log("✅ Payment transaction committed!");
                     res.status(200).json({ 
                         message: "✅ Payment verified! Order confirmed!" 
                     });
-                }
+                });
             });
-        }
+        });
     });
 });
-
 
 // =============================================
 // ROUTE 3 — Get ALL payments (admin only)

@@ -6,7 +6,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
-function Navbar() {
+function Navbar({ currentUser, onLogout, onLoginClick }) {
   return (
     <nav className="navbar">
 
@@ -22,6 +22,24 @@ function Navbar() {
         <li><Link to="/booking">Book Now</Link></li>
         {/* <li><Link to="/admin">Admin</Link></li> */}
       </ul>
+
+      {/* ── ADD THIS PART HERE ── */}
+      {currentUser ? (
+        // USER IS LOGGED IN
+        <div className="nav-user">
+          <span className="nav-username">
+            👤 Hi, {currentUser.full_name}!
+          </span>
+          <button className="nav-logout-btn" onClick={onLogout}>
+            Logout
+          </button>
+        </div>
+      ) : (
+        // USER IS NOT LOGGED IN
+        <button className="nav-login-btn" onClick={onLoginClick}>
+          Login / Sign Up
+        </button>
+      )}
 
     </nav>
   );

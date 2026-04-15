@@ -14,12 +14,12 @@ function Payment() {
 
   // Read data passed from Booking page
   // when we did navigate('/payment', { state: {...} })
-  const { 
-    orderId, 
-    customerId, 
-    amount, 
-    totalAmount, 
-    customerName 
+  const {
+    orderId,
+    customerId,
+    amount,
+    totalAmount,
+    customerName
   } = location.state || {};
 
   const [loading, setLoading] = useState(false);
@@ -43,6 +43,10 @@ function Payment() {
   async function handlePayment() {
     setLoading(true);
 
+    // get token from localStorage
+    const token = localStorage.getItem('token');
+
+
     try {
       // Step 1 — Create Razorpay order in backend
       const response = await axios.post(
@@ -51,6 +55,9 @@ function Payment() {
           amount: amount,
           order_id: orderId,
           customer_id: customerId
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
 
@@ -67,7 +74,7 @@ function Payment() {
         order_id: razorpayOrderId,
 
         // This function runs when payment is SUCCESSFUL
-        handler: async function(paymentResponse) {
+        handler: async function (paymentResponse) {
 
           // Step 3 — Verify payment in backend
           await axios.post('http://localhost:5000/payments/verify', {
@@ -111,7 +118,7 @@ function Payment() {
           <p>Your booking has been confirmed.</p>
           <p>Order ID: <strong>#{orderId}</strong></p>
           <p>Amount Paid: <strong>₹{amount}</strong></p>
-          <button 
+          <button
             className="home-btn"
             onClick={() => navigate('/')}
           >
@@ -163,7 +170,7 @@ function Payment() {
           </div>
 
           {/* Pay button */}
-          <button 
+          <button
             className="pay-btn"
             onClick={handlePayment}
             disabled={loading}

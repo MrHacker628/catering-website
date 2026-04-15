@@ -42,3 +42,50 @@
 .navbar-links a:hover {
   color: #f0c040;                  /* yellow on hover */
 } 
+
+
+/* ── USER INFO IN NAVBAR ── */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-username {
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.nav-login-btn {
+  padding: 8px 20px;
+  background: white;
+  color: #4a0080;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-login-btn:hover {
+  background: #f0d0ff;
+}
+
+.nav-logout-btn {
+  padding: 8px 20px;
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-logout-btn:hover {
+  background: white;
+  color: #4a0080;
+}

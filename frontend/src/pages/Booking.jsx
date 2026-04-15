@@ -1,21 +1,27 @@
-// Booking.jsx — Customer fills this form to place an order
-// This page has 2 steps:
-// Step 1 — Customer fills their personal details
-// Step 2 — Customer selects menu items and sees price
+// Booking.jsx — Customer books a catering package
+// STEP 1 — Fill details + select package + select guests
+// STEP 2 — See booking summary + confirm + pay
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Booking.css';
 
-function Booking() {
+function Booking({ currentUser }) {
 
   const navigate = useNavigate();
 
-  // ── STEP tracking ──
-  // step 1 = customer details form
-  // step 2 = menu selection
+  // ── STEP TRACKING ──
+  // step 1 = fill details and select package
+  // step 2 = booking summary and payment
   const [step, setStep] = useState(1);
+
+  // ── PACKAGES ──
+  // stores all 7 packages fetched from backend
+  const [packages, setPackages] = useState([]);
+
+  // selectedPackage = the package object customer chose
+  const [selectedPackage, setSelectedPackage] = useState(null);
 
   // ── CUSTOMER DETAILS ──
   const [customerData, setCustomerData] = useState({
@@ -33,53 +39,77 @@ function Booking() {
     num_of_guests: ''
   });
 
-  // ── MENU SELECTION ──
-  const [menuItems, setMenuItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [priceDetails, setPriceDetails] = useState(null);
-
-  // ── ERROR MESSAGES ──
+  // ── ERROR AND LOADING ──
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  // Fetch menu items when page loads
+  // ── FETCH PACKAGES WHEN PAGE LOADS ──
   useEffect(() => {
-    axios.get('http://localhost:5000/menu/all')
-      .then(function(response) {
-        setMenuItems(response.data);
+    axios.get('http://localhost:5000/packages/all')
+      .then(function (response) {
+        setPackages(response.data);
       })
-      .catch(function(error) {
-        console.log("Error fetching menu:", error);
+      .catch(function (error) {
+        console.log("Error fetching packages:", error);
       });
   }, []);
 
-  // ── HANDLE INPUT CHANGE ──
-  // this one function handles ALL input changes
-  // e.target.name tells us WHICH input changed
-  // e.target.value tells us the NEW value
+  // ── AUTO-FILL USER DETAILS IF LOGGED IN ──
+  useEffect(function () {
+    if (currentUser) {
+      setCustomerData({
+        full_name: currentUser.full_name || '',
+        email: currentUser.email || '',
+        phone: currentUser.phone || '',
+        address: currentUser.address || ''
+      });
+    }
+  }, [currentUser]);
+
+  // ── HANDLE INPUT CHANGES ──
   function handleCustomerChange(e) {
-    setCustomerData({
-      ...customerData,           // keep all existing values
-      [e.target.name]: e.target.value  // update only the changed field
-    });
+    setCustomerData({ ...customerData, [e.target.name]: e.target.value });
   }
 
   function handleEventChange(e) {
-    setEventData({
-      ...eventData,
-      [e.target.name]: e.target.value
-    });
+    setEventData({ ...eventData, [e.target.name]: e.target.value });
   }
 
-  // ── TOGGLE MENU ITEM SELECTION ──
-  function toggleMenuItem(itemId) {
-    if (selectedItems.includes(itemId)) {
-      // item already selected — remove it
-      setSelectedItems(selectedItems.filter(id => id !== itemId));
+  // ── WHEN PACKAGE IS SELECTED FROM DROPDOWN ──
+  function handlePackageChange(e) {
+    const packageId = e.target.value;
+
+    if (!packageId) {
+      setSelectedPackage(null);
+      return;
+    }
+
+    // find the full package object from packages array
+    const pkg = packages.find(function (p) {
+      return p.id === parseInt(packageId);
+    });
+
+    setSelectedPackage(pkg);
+  }
+
+  // ── CALCULATE PRICE BASED ON GUESTS ──
+  // called automatically when package or guests changes
+  function getPrice() {
+    if (!selectedPackage || !eventData.num_of_guests) return null;
+
+    if (eventData.num_of_guests === '500') {
+      return {
+        total: selectedPackage.total_500,
+        perPlate: selectedPackage.price_500,
+        guests: 500
+      };
     } else {
-      // item not selected — add it
-      setSelectedItems([...selectedItems, itemId]);
+      return {
+        total: selectedPackage.total_600,
+        perPlate: selectedPackage.price_600,
+        guests: 600
+      };
     }
   }
 
@@ -91,70 +121,62 @@ function Booking() {
     if (!customerData.email) newErrors.email = 'Email is required!';
     else if (!customerData.email.includes('@')) newErrors.email = 'Enter valid email!';
     if (!customerData.phone) newErrors.phone = 'Phone is required!';
-    else if (customerData.phone.length < 10) newErrors.phone = 'Enter valid phone number!';
+    else if (customerData.phone.length < 10) newErrors.phone = 'Enter valid phone!';
     if (!eventData.event_type) newErrors.event_type = 'Event type is required!';
-    if (!eventData.event_date) newErrors.event_date = 'Event date is required!';
+    if (!eventData.event_date) {
+      newErrors.event_date = 'Event date is required!';
+    } else {
+      // check if selected date is in the past
+      const selectedDate = new Date(eventData.event_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // reset time to midnight
+
+      if (selectedDate < today) {
+        newErrors.event_date = 'Please select a future date!';
+      }
+    }
     if (!eventData.event_location) newErrors.event_location = 'Location is required!';
-    if (!eventData.num_of_guests) newErrors.num_of_guests = 'Number of guests is required!';
-    else if (eventData.num_of_guests < 10) newErrors.num_of_guests = 'Minimum 10 guests!';
+    if (!eventData.num_of_guests) newErrors.num_of_guests = 'Select number of guests!';
+    if (!selectedPackage) newErrors.package = 'Please select a package!';
 
     setErrors(newErrors);
-
-    // if no errors object is empty — return true
     return Object.keys(newErrors).length === 0;
   }
 
   // ── GO TO STEP 2 ──
   function goToStep2() {
     if (validateStep1()) {
-      setStep(2);  // move to menu selection
+      setStep(2);
     }
-  }
-
-  // ── CALCULATE PRICE ──
-  function calculatePrice() {
-    if (selectedItems.length === 0) {
-      setMessage('Please select at least one menu item!');
-      return;
-    }
-
-    setLoading(true);
-    // send selected items and guests to backend
-    // backend calculates total, advance and balance
-    axios.post('http://localhost:5000/menu/calculate', {
-      selected_items: selectedItems,
-      num_of_guests: parseInt(eventData.num_of_guests)
-    })
-    .then(function(response) {
-      setPriceDetails(response.data);
-      setLoading(false);
-      setMessage('');
-    })
-    .catch(function(error) {
-      console.log("Error calculating price:", error);
-      setLoading(false);
-    });
   }
 
   // ── SUBMIT BOOKING ──
   async function submitBooking() {
-    if (!priceDetails) {
-      setMessage('Please calculate price first!');
-      return;
-    }
-
     setLoading(true);
+    const price = getPrice();
 
     try {
-      // Step 1 — Save customer to database
+      const token = localStorage.getItem('token');
+
+      // advance = 30% of total
+      const advanceAmount = Math.round(price.total * 0.3);
+      const balanceAmount = price.total - advanceAmount;
+
+      // STEP 1 — Save customer
       const customerResponse = await axios.post(
         'http://localhost:5000/customers/add',
-        customerData
+        {
+          full_name: customerData.full_name,
+          email: customerData.email,
+          phone: customerData.phone,
+          address: customerData.address
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const customerId = customerResponse.data.customerId;
 
-      // Step 2 — Save order to database
+      // STEP 2 — Save order
       const orderResponse = await axios.post(
         'http://localhost:5000/orders/add',
         {
@@ -163,32 +185,40 @@ function Booking() {
           event_date: eventData.event_date,
           event_location: eventData.event_location,
           num_of_guests: eventData.num_of_guests,
-          menu_selected: selectedItems.join(','),
-          total_amount: priceDetails.total_amount,
-          advance_amount: priceDetails.advance_amount
-        }
+          menu_selected: selectedPackage.package_name,
+          total_amount: price.total,
+          advance_amount: advanceAmount,
+          balance_amount: balanceAmount
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const orderId = orderResponse.data.orderId;
 
-      // Step 3 — Go to payment page with details
-      // we pass order details via navigation state
+      // STEP 3 — Go to payment page
       navigate('/payment', {
         state: {
           orderId,
           customerId,
-          amount: priceDetails.advance_amount,
-          totalAmount: priceDetails.total_amount,
+          amount: advanceAmount,
+          totalAmount: price.total,
           customerName: customerData.full_name
         }
       });
 
     } catch (error) {
-      console.log("Error submitting booking:", error);
-      setMessage('Error submitting booking. Please try again!');
+      // 2. Show the real error message on the screen instead of the generic one
+      const realErrorMessage = error.response?.data?.message || 'Server error. Check console.';
+      setMessage(`❌ ${realErrorMessage}`);
+      //old
+      // console.log("Error submitting booking:", error);
+      // setMessage('Error submitting booking. Please try again!');
       setLoading(false);
     }
   }
+
+  // get current price based on selection
+  const price = getPrice();
 
   return (
     <div className="booking-page">
@@ -200,85 +230,74 @@ function Booking() {
 
         {/* Step indicator */}
         <div className="step-indicator">
-          <div className={`step ${step >= 1 ? 'active' : ''}`}>1. Your Details</div>
+          <div className={`step ${step >= 1 ? 'active' : ''}`}>
+            1. Your Details
+          </div>
           <div className="step-line"></div>
-          <div className={`step ${step >= 2 ? 'active' : ''}`}>2. Select Menu</div>
+          <div className={`step ${step >= 2 ? 'active' : ''}`}>
+            2. Booking Summary
+          </div>
         </div>
       </div>
 
       <div className="booking-content">
 
-        {/* ════════ STEP 1 — Customer & Event Details ════════ */}
+        {/* ════════ STEP 1 ════════ */}
         {step === 1 && (
           <div className="booking-form">
-            <h2>Your Details</h2>
 
-            {/* Customer Info */}
+            {/* ── PERSONAL INFORMATION ── */}
             <div className="form-section">
               <h3>📋 Personal Information</h3>
 
               <div className="form-group">
                 <label>Full Name</label>
-                <input
-                  type="text"
-                  name="full_name"
+                <input type="text" name="full_name"
                   placeholder="Enter your full name"
                   value={customerData.full_name}
-                  onChange={handleCustomerChange}
-                />
-                {errors.full_name && 
+                  onChange={handleCustomerChange} />
+                {errors.full_name &&
                   <span className="error">{errors.full_name}</span>}
               </div>
 
               <div className="form-group">
                 <label>Email</label>
-                <input
-                  type="text"
-                  name="email"
+                <input type="text" name="email"
                   placeholder="Enter your email"
                   value={customerData.email}
-                  onChange={handleCustomerChange}
-                />
-                {errors.email && 
+                  onChange={handleCustomerChange} />
+                {errors.email &&
                   <span className="error">{errors.email}</span>}
               </div>
 
               <div className="form-group">
                 <label>Phone Number</label>
-                <input
-                  type="text"
-                  name="phone"
+                <input type="text" name="phone"
                   placeholder="Enter your phone number"
                   value={customerData.phone}
-                  onChange={handleCustomerChange}
-                />
-                {errors.phone && 
+                  onChange={handleCustomerChange} />
+                {errors.phone &&
                   <span className="error">{errors.phone}</span>}
               </div>
 
               <div className="form-group">
                 <label>Address</label>
-                <input
-                  type="text"
-                  name="address"
+                <input type="text" name="address"
                   placeholder="Enter your address"
                   value={customerData.address}
-                  onChange={handleCustomerChange}
-                />
+                  onChange={handleCustomerChange} />
               </div>
             </div>
 
-            {/* Event Info */}
+            {/* ── EVENT DETAILS ── */}
             <div className="form-section">
               <h3>🎉 Event Details</h3>
 
               <div className="form-group">
                 <label>Event Type</label>
-                <select
-                  name="event_type"
+                <select name="event_type"
                   value={eventData.event_type}
-                  onChange={handleEventChange}
-                >
+                  onChange={handleEventChange}>
                   <option value="">Select Event Type</option>
                   <option value="Wedding">Wedding 💍</option>
                   <option value="Birthday">Birthday 🎂</option>
@@ -286,106 +305,197 @@ function Booking() {
                   <option value="Anniversary">Anniversary 💑</option>
                   <option value="Other">Other 🎊</option>
                 </select>
-                {errors.event_type && 
+                {errors.event_type &&
                   <span className="error">{errors.event_type}</span>}
               </div>
 
               <div className="form-group">
                 <label>Event Date</label>
-                <input
-                  type="date"
-                  name="event_date"
+                <input type="date" name="event_date"
                   value={eventData.event_date}
                   onChange={handleEventChange}
-                />
-                {errors.event_date && 
+                  min={new Date().toISOString().split('T')[0]} />
+                {errors.event_date &&
                   <span className="error">{errors.event_date}</span>}
               </div>
 
               <div className="form-group">
                 <label>Event Location</label>
-                <input
-                  type="text"
-                  name="event_location"
+                <input type="text" name="event_location"
                   placeholder="Enter event location/venue"
                   value={eventData.event_location}
-                  onChange={handleEventChange}
-                />
-                {errors.event_location && 
+                  onChange={handleEventChange} />
+                {errors.event_location &&
                   <span className="error">{errors.event_location}</span>}
               </div>
 
               <div className="form-group">
                 <label>Number of Guests</label>
-                <input
-                  type="number"
-                  name="num_of_guests"
-                  placeholder="Minimum 10 guests"
+                <select name="num_of_guests"
                   value={eventData.num_of_guests}
-                  onChange={handleEventChange}
-                />
-                {errors.num_of_guests && 
+                  onChange={handleEventChange}>
+                  <option value="">Select Number of Guests</option>
+                  <option value="500">500 Guests</option>
+                  <option value="600">600 Guests</option>
+                </select>
+                {errors.num_of_guests &&
                   <span className="error">{errors.num_of_guests}</span>}
               </div>
             </div>
 
+            {/* ── PACKAGE SELECTION ── */}
+            <div className="form-section">
+              <h3>📦 Select Package</h3>
+
+              <div className="form-group">
+                <label>Choose Your Package</label>
+                <select onChange={handlePackageChange}
+                  defaultValue="">
+                  <option value="">Select a Package</option>
+                  {packages.map(function (pkg) {
+                    return (
+                      <option key={pkg.id} value={pkg.id}>
+                        {pkg.package_name} — {pkg.package_type}
+                      </option>
+                    );
+                  })}
+                </select>
+                {errors.package &&
+                  <span className="error">{errors.package}</span>}
+              </div>
+
+              {/* SHOW PACKAGE PREVIEW WHEN SELECTED */}
+              {selectedPackage && (
+                <div className="package-preview">
+                  <h4>📋 {selectedPackage.package_name}</h4>
+                  <p>🏮 {selectedPackage.counter_setup}</p>
+                  <p>👨‍🍳 {selectedPackage.waiter_info}</p>
+
+                  <div className="preview-section">
+                    <strong>🥤 Welcome Drink:</strong>
+                    <p>{selectedPackage.welcome_drink}</p>
+                  </div>
+
+                  <div className="preview-section">
+                    <strong>🍽️ Main Course:</strong>
+                    <p>{selectedPackage.main_course}</p>
+                  </div>
+
+                  <div className="preview-section">
+                    <strong>🍮 Desserts:</strong>
+                    <p>{selectedPackage.desserts}</p>
+                  </div>
+
+                  {selectedPackage.extras && (
+                    <div className="preview-section">
+                      <strong>✨ Extras:</strong>
+                      <p>{selectedPackage.extras}</p>
+                    </div>
+                  )}
+
+                  {/* SHOW PRICE IF GUESTS SELECTED */}
+                  {price && (
+                    <div className="price-preview">
+                      <p>👥 {price.guests} Guests
+                        × ₹{price.perPlate}/plate</p>
+                      <h3>Total: ₹{price.total.toLocaleString()}</h3>
+                      <p>Advance (30%):
+                        ₹{Math.round(price.total * 0.3).toLocaleString()}
+                      </p>
+                      <p>Balance (70%):
+                        ₹{Math.round(price.total * 0.7).toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <button className="booking-btn" onClick={goToStep2}>
-              Next — Select Menu →
+              Next — Review Booking →
             </button>
 
           </div>
         )}
 
-        {/* ════════ STEP 2 — Menu Selection ════════ */}
+        {/* ════════ STEP 2 — BOOKING SUMMARY ════════ */}
         {step === 2 && (
-          <div className="menu-selection">
-            <h2>Select Your Menu Items</h2>
-            <p>Click items to select/deselect them</p>
+          <div className="booking-summary">
+            <h2>📋 Booking Summary</h2>
 
-            {/* Menu Items Grid */}
-            <div className="selection-grid">
-              {menuItems.map(function(item) {
-                const isSelected = selectedItems.includes(item.id);
-                return (
-                  <div
-                    key={item.id}
-                    className={`selection-card ${isSelected ? 'selected' : ''}`}
-                    onClick={() => toggleMenuItem(item.id)}
-                  >
-                    <span className="sel-badge">{item.category}</span>
-                    <h4>{item.item_name}</h4>
-                    <p>₹{item.price_per_plate} per plate</p>
-                    {/* show checkmark if selected */}
-                    {isSelected && <span className="checkmark">✅</span>}
-                  </div>
-                );
-              })}
+            {/* Customer Details */}
+            <div className="summary-section">
+              <h3>👤 Customer Details</h3>
+              <p><strong>Name:</strong> {customerData.full_name}</p>
+              <p><strong>Email:</strong> {customerData.email}</p>
+              <p><strong>Phone:</strong> {customerData.phone}</p>
+              {customerData.address &&
+                <p><strong>Address:</strong> {customerData.address}</p>}
             </div>
 
-            {/* Calculate Price Button */}
-            <button className="booking-btn" onClick={calculatePrice}>
-              Calculate Price 🧮
-            </button>
+            {/* Event Details */}
+            <div className="summary-section">
+              <h3>🎉 Event Details</h3>
+              <p><strong>Event Type:</strong> {eventData.event_type}</p>
+              <p><strong>Date:</strong> {eventData.event_date}</p>
+              <p><strong>Location:</strong> {eventData.event_location}</p>
+              <p><strong>Guests:</strong> {eventData.num_of_guests}</p>
+            </div>
 
-            {/* Price Details — shown after calculation */}
-            {priceDetails && (
-              <div className="price-summary">
+            {/* Package Details */}
+            <div className="summary-section">
+              <h3>📦 Package Details</h3>
+              <p><strong>Package:</strong> {selectedPackage.package_name}</p>
+              <p><strong>Setup:</strong> {selectedPackage.counter_setup}</p>
+              <p><strong>Waiters:</strong> {selectedPackage.waiter_info}</p>
+
+              <div className="summary-menu">
+                <p><strong>🥤 Welcome Drink:</strong></p>
+                <p>{selectedPackage.welcome_drink}</p>
+                <p><strong>🍽️ Main Course:</strong></p>
+                <p>{selectedPackage.main_course}</p>
+                <p><strong>🍮 Desserts:</strong></p>
+                <p>{selectedPackage.desserts}</p>
+                {selectedPackage.extras && (
+                  <>
+                    <p><strong>✨ Extras:</strong></p>
+                    <p>{selectedPackage.extras}</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Price Summary */}
+            {price && (
+              <div className="summary-price">
                 <h3>💰 Price Summary</h3>
-                <p>Guests: <strong>{priceDetails.num_of_guests}</strong></p>
-                <p>Price per plate: <strong>₹{priceDetails.price_per_plate}</strong></p>
-                <p>Total Amount: <strong>₹{priceDetails.total_amount}</strong></p>
-                <p>Advance (30%): <strong>₹{priceDetails.advance_amount}</strong></p>
-                <p>Balance (70%): <strong>₹{priceDetails.balance_amount}</strong></p>
-
-                <button className="booking-btn confirm" onClick={submitBooking}>
-                  {loading ? 'Processing...' : 'Confirm & Pay Advance 💳'}
-                </button>
+                <p>{price.guests} Guests
+                  × ₹{price.perPlate}/plate</p>
+                <div className="price-total">
+                  <h2>Total: ₹{price.total.toLocaleString()}</h2>
+                </div>
+                <p>✅ Advance to pay now (30%):
+                  <strong> ₹{Math.round(price.total * 0.3).toLocaleString()}</strong>
+                </p>
+                <p>📅 Balance on event day (70%):
+                  <strong> ₹{Math.round(price.total * 0.7).toLocaleString()}</strong>
+                </p>
               </div>
             )}
 
-            {message && <p className="error-msg">{message}</p>}
+            {message &&
+              <p className="error-msg">{message}</p>}
 
-            {/* Back button */}
+            {/* Confirm Button */}
+            <button
+              className="booking-btn confirm"
+              onClick={submitBooking}
+              disabled={loading}
+            >
+              {loading ? 'Processing...' : 'Confirm & Pay Advance 💳'}
+            </button>
+
+            {/* Back Button */}
             <button className="back-btn" onClick={() => setStep(1)}>
               ← Back to Details
             </button>

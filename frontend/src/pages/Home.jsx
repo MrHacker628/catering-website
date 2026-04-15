@@ -1,13 +1,19 @@
- import React from 'react';
+// import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthModal from '../components/AuthModal';
 import './Home.css';
 
- // Home.jsx — temporary placeholder
-// We will build the full page next
 
-function Home() {
 
-    // useNavigate lets us go to another page on button click
+function Home({ currentUser, onLoginSuccess, showAuthModal, setShowAuthModal }) {
+  // controls if modal is visible or not
+  const [showModal, setShowModal] = useState(false);
+  
+
+
+
+  // useNavigate lets us go to another page on button click
   const navigate = useNavigate();
 
   return (
@@ -17,12 +23,17 @@ function Home() {
       <div className="hero">
         <div className="hero-content">
           <h1>Welcome to Mannat Catering 🍽️</h1>
-          <p>Premium catering services for Weddings, Birthdays, 
-             Corporate Events and all special occasions</p>
+          <p>Premium catering services for Weddings, Birthdays,
+            Corporate Events and all special occasions</p>
 
           {/* Clicking this button goes to /booking page */}
           <button className="hero-btn" onClick={() => navigate('/booking')}>
             Book Now
+          </button>
+
+          {/* temporary button to test modal */}
+          <button className="hero-btn" onClick={() => setShowAuthModal(true)}>
+            Login / Sign Up
           </button>
 
           {/* Clicking this button goes to /menu page */}
@@ -88,6 +99,16 @@ function Home() {
         </button>
       </div>
 
+      {/* only show modal if showModal is true */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onLoginSuccess={(user) => { 
+            onLoginSuccess(user); // update App.js state
+            setShowAuthModal(false); // close modal
+          }}
+        />
+      )}
     </div>
   );
 }
