@@ -25,18 +25,12 @@
   margin-bottom: var(--space-md);
 }
 
-.footer__logo-mark {
-  width: 38px;
+.footer__logo-img {
   height: 38px;
-  background: linear-gradient(135deg, var(--green-600), var(--green-500));
+  width: auto;
+  object-fit: contain;
+  display: block;
   border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--white);
 }
 
 .footer__logo-text {

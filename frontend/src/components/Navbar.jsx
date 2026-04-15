@@ -55,8 +55,8 @@ function Navbar({ currentUser, onLogout, onLoginClick }) {
       <header className="navbar navbar--admin">
         <nav className="navbar__inner container" aria-label="Admin navigation">
           <Link to="/" className="navbar__logo" aria-label="Mannat Caterers Home">
-            <span className="navbar__logo-mark">M</span>
-            <span className="navbar__logo-text">Mannat<br/><small>Caterers</small></span>
+            <img src="/mannat catererslogo.png" alt="Mannat Caterers logo" className="navbar__logo-img" />
+            <span className="navbar__logo-text">Mannat<br /><small>Caterers</small></span>
           </Link>
         </nav>
       </header>
@@ -69,8 +69,8 @@ function Navbar({ currentUser, onLogout, onLoginClick }) {
 
         {/* Logo */}
         <Link to="/" className="navbar__logo" aria-label="Mannat Caterers Home">
-          <span className="navbar__logo-mark">M</span>
-          <span className="navbar__logo-text">Mannat<br/><small>Caterers</small></span>
+          <img src="/mannat catererslogo.png" alt="Mannat Caterers logo" className="navbar__logo-img" />
+          <span className="navbar__logo-text">Mannat<br /><small>Caterers</small></span>
         </Link>
 
         {/* Desktop Links */}

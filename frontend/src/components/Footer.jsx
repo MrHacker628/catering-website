@@ -17,7 +17,7 @@ function Footer() {
           {/* Brand */}
           <div className="footer__brand">
             <div className="footer__logo">
-              <span className="footer__logo-mark">M</span>
+              <img src="/mannat catererslogo.png" alt="Mannat Caterers logo" className="footer__logo-img" />
               <span className="footer__logo-text">Mannat Caterers</span>
             </div>
             <p>Creating exquisite culinary experiences for life's most memorable celebrations since 1995. Based in the heart of Goa.</p>

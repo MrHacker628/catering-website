@@ -18,12 +18,12 @@ function getMinDate() {
 }
 
 const categoryImages = {
-  'Veg Thali':      'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200&h=150&fit=crop',
-  'Non-Veg Thali':  'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=200&h=150&fit=crop',
-  'Biryani':        'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&h=150&fit=crop',
-  'Starters':       'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200&h=150&fit=crop',
-  'Desserts':       'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=200&h=150&fit=crop',
-  'Beverages':      'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=200&h=150&fit=crop',
+  'Veg Thali': 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200&h=150&fit=crop',
+  'Non-Veg Thali': 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=200&h=150&fit=crop',
+  'Biryani': 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&h=150&fit=crop',
+  'Starters': 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200&h=150&fit=crop',
+  'Desserts': 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=200&h=150&fit=crop',
+  'Beverages': 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=200&h=150&fit=crop',
   'Custom Package': 'https://images.unsplash.com/photo-1555244162-803834f70033?w=200&h=150&fit=crop',
 };
 
@@ -35,6 +35,7 @@ function Booking({ currentUser, onLoginClick }) {
 
   /* ── State ── */
   const [customer, setCustomer] = useState({ full_name: '', email: '', phone: '', address: '' });
+  const [phoneDigits, setPhoneDigits] = useState('');
   const [event, setEvent] = useState({ event_type: '', event_date: '', event_location: '', num_of_guests: '' });
   const [menuItems, setMenuItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState({}); // { itemId: quantity }
@@ -47,10 +48,13 @@ function Booking({ currentUser, onLoginClick }) {
   /* ── Pre-fill customer data from logged-in user ── */
   useEffect(() => {
     if (currentUser) {
+      const rawPhone = currentUser.phone || '';
+      const digits = rawPhone.replace(/^\+91-?/, '');
+      setPhoneDigits(digits);
       setCustomer({
         full_name: currentUser.full_name || '',
         email: currentUser.email || '',
-        phone: currentUser.phone || '',
+        phone: digits ? `+91${digits}` : '',
         address: currentUser.address || '',
       });
     }
@@ -67,6 +71,13 @@ function Booking({ currentUser, onLoginClick }) {
   function handleCustomer(e) {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: '' });
+  }
+
+  function handlePhoneDigits(e) {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhoneDigits(raw);
+    setCustomer(prev => ({ ...prev, phone: raw ? `+91${raw}` : '' }));
+    setErrors(prev => ({ ...prev, phone: '' }));
   }
 
   function handleEvent(e) {
@@ -115,8 +126,7 @@ function Booking({ currentUser, onLoginClick }) {
     if (!customer.full_name.trim()) e.full_name = 'Name is required';
     if (!customer.email.trim()) e.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) e.email = 'Enter a valid email';
-    if (!customer.phone.trim()) e.phone = 'Phone is required';
-    else if (!/^\+91[0-9]{10}$/.test(customer.phone)) e.phone = 'Format: +91XXXXXXXXXX';
+    if (!customer.phone || !/^\+91[0-9]{10}$/.test(customer.phone)) e.phone = 'Enter a valid 10-digit mobile number';
     if (!customer.address.trim()) e.address = 'Address is required';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -262,9 +272,11 @@ function Booking({ currentUser, onLoginClick }) {
 
                   <div className="form-field">
                     <label htmlFor="phone">Phone Number</label>
-                    <input id="phone" name="phone" type="tel" placeholder="+91XXXXXXXXXX" value={customer.phone} onChange={handleCustomer} />
+                    <div className="phone-input-group">
+                      <span className="phone-prefix">+91 -</span>
+                      <input id="phone" name="phone" type="tel" placeholder="Enter 10-digit number" value={phoneDigits} onChange={handlePhoneDigits} maxLength="10" inputMode="numeric" />
+                    </div>
                     {errors.phone && <span className="field-error">{errors.phone}</span>}
-                    <span className="field-hint">Indian number with +91 prefix</span>
                   </div>
 
                   <div className="form-field">
@@ -275,7 +287,7 @@ function Booking({ currentUser, onLoginClick }) {
 
                   <button className="btn btn--primary btn--lg btn--full" onClick={goNext}>
                     Continue to Event Details
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                   </button>
                 </div>
               )}
@@ -322,7 +334,7 @@ function Booking({ currentUser, onLoginClick }) {
                     <button className="btn btn--ghost" onClick={goBack}>← Back</button>
                     <button className="btn btn--primary btn--lg" onClick={goNext}>
                       Continue to Menu
-                      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                     </button>
                   </div>
                 </div>
@@ -381,7 +393,7 @@ function Booking({ currentUser, onLoginClick }) {
                     <button className="btn btn--ghost" onClick={goBack}>← Back</button>
                     <button className="btn btn--primary btn--lg" onClick={goNext}>
                       Review Order
-                      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                     </button>
                   </div>
                 </div>
@@ -501,7 +513,7 @@ function Booking({ currentUser, onLoginClick }) {
               <span>{billing.items.length} item{billing.items.length > 1 ? 's' : ''}</span>
               <strong>₹{billing.total > 0 ? billing.total.toLocaleString() : billing.perPlate.toLocaleString()}</strong>
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: sidebarOpen ? 'rotate(180deg)' : '' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"/>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
               </svg>
             </button>
 

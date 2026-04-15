@@ -35,18 +35,12 @@
   z-index: 10;
 }
 
-.navbar__logo-mark {
-  width: 42px;
+.navbar__logo-img {
   height: 42px;
-  background: linear-gradient(135deg, var(--green-600), var(--green-500));
+  width: auto;
+  object-fit: contain;
+  display: block;
   border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--white);
 }
 
 .navbar__logo-text {
@@ -224,6 +218,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -308,13 +303,13 @@
   gap: 12px;
 }
 
-.profile-card__details li > svg {
+.profile-card__details li>svg {
   margin-top: 2px;
   color: var(--green-500);
   flex-shrink: 0;
 }
 
-.profile-card__details li > div {
+.profile-card__details li>div {
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -458,6 +453,7 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
+
   .navbar__links,
   .navbar__right {
     display: none;

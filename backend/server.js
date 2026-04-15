@@ -33,7 +33,7 @@ const customerRoutes = require('./routes/customers');
 // Use the routes
 // This means all customer routes start with /customers
 // eg: /customers/add , /customers/all
-app.use('/customers', customerRoutes);
+app.use('/customers', verifyToken, customerRoutes);
 
 
 // Import inventory routes
@@ -55,14 +55,14 @@ app.use('/menu', menuRoutes);
 const orderRoutes = require('./routes/orders');
 
 // Use orders routes
-app.use('/orders', orderRoutes);
+app.use('/orders', verifyToken, orderRoutes);
 
 
 // Import payment routes
 const paymentRoutes = require('./routes/payments');
 
 // Use payment routes
-app.use('/payments', paymentRoutes);
+app.use('/payments', verifyToken,paymentRoutes);
 
 
 // Import auth routes

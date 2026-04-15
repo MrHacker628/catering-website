@@ -92,14 +92,12 @@ router.post('/add', function(req, res) {
 });
 
 
-const verifyToken = require('../middleware/auth');
-
 // =============================================
 // ROUTE 2 — Get ALL orders (admin only)
 // GET request — admin views all bookings
 // JOIN combines orders with customer names
 // =============================================
-router.get('/all', verifyToken, function(req, res) {
+router.get('/all', function(req, res) {
 
     // JOIN query — gets order details WITH customer name
     // Instead of just showing customer_id, we show their name

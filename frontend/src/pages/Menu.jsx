@@ -8,12 +8,12 @@ const categories = ['All', 'Veg Thali', 'Non-Veg Thali', 'Biryani', 'Starters', 
 
 /* Placeholder images by category */
 const categoryImages = {
-  'Veg Thali':      'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop',
-  'Non-Veg Thali':  'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=400&h=300&fit=crop',
-  'Biryani':        'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop',
-  'Starters':       'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop',
-  'Desserts':       'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=300&fit=crop',
-  'Beverages':      'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=300&fit=crop',
+  'Veg Thali': 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop',
+  'Non-Veg Thali': 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=400&h=300&fit=crop',
+  'Biryani': 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop',
+  'Starters': 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop',
+  'Desserts': 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=300&fit=crop',
+  'Beverages': 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=300&fit=crop',
   'Custom Package': 'https://images.unsplash.com/photo-1555244162-803834f70033?w=400&h=300&fit=crop',
 };
 
@@ -30,11 +30,11 @@ function Menu() {
   function fetchMenu() {
     setLoading(true);
     axios.get('http://localhost:5000/menu/all')
-      .then(function(res) {
+      .then(function (res) {
         setMenuItems(res.data);
         setLoading(false);
       })
-      .catch(function(err) {
+      .catch(function (err) {
         console.log("Error fetching menu:", err);
         setLoading(false);
       });
@@ -137,7 +137,7 @@ function Menu() {
           <div className="modal-overlay" onClick={() => setSelectedItem(null)} role="dialog" aria-modal="true" aria-label={`Details for ${selectedItem.item_name}`}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
               <button className="modal__close" onClick={() => setSelectedItem(null)} aria-label="Close modal">
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
 
               <div className="modal__img">
