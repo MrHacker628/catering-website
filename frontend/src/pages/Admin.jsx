@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { BarChart, Package, Calendar, Users, CreditCard, DollarSign, TrendingUp, Trash2 } from 'lucide-react';
 import './Admin.css';
 
 function Admin() {
@@ -34,18 +35,16 @@ function Admin() {
   // This stores error message if wrong password
   const [passwordError, setPasswordError] = useState('');
 
-  // The correct password — only you know this!
-  const ADMIN_PASSWORD = 'mannat2026';
-
-  const [activeTab, setActiveTab] = useState('orders');
-
-  // These store data fetched from MySQL
+  const [tab, setTab] = useState('analytics');
   const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [newItem, setNewItem] = useState({
+    item_name: '', category: '', quantity: '', unit: '', minimum_stock: '', price_per_unit: ''
+  });
 
   // This function runs when Login button is clicked
   function handlePasswordSubmit() {
@@ -100,6 +99,7 @@ function Admin() {
       });
   }
 
+  useEffect(() => { if (isAuth) fetchAll(); }, [isAuth]);
 
   // Updates order status when admin changes dropdown
   function updateOrderStatus(orderId, newStatus) {
@@ -174,8 +174,12 @@ function Admin() {
     if (isAuthenticated) {
       fetchAllData();
     }
-  }, [isAuthenticated]);
+  }
 
+  // Stats
+  const totalRev = orders.reduce((s, o) => s + (parseFloat(o.total_amount) || 0), 0);
+  const avgOrder = orders.length > 0 ? totalRev / orders.length : 0;
+  const successPay = payments.filter(p => p.payment_status === 'success').length;
 
   // ─────────────────────────────────────────
   // if NOT logged in → show password screen
@@ -517,4 +521,5 @@ function Admin() {
     </div>
   );
 }
+
 export default Admin;
