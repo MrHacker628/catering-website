@@ -1,190 +1,159 @@
-// Payment.jsx — Shows payment summary and Razorpay button
-// useLocation lets us read data passed from Booking page
-// useNavigate lets us redirect after payment
-
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
+import { ClipboardList } from 'lucide-react';
 import './Payment.css';
 
-function Payment() {
+/* Auth header helper — reads JWT token from localStorage */
+function getAuthHeaders() {
+  const token = localStorage.getItem('token');
+  return { headers: { Authorization: `Bearer ${token}` } };
+}
 
+function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Read data passed from Booking page
-  // when we did navigate('/payment', { state: {...} })
-  const {
-    orderId,
-    customerId,
-    amount,
-    totalAmount,
-    customerName
-  } = location.state || {};
+  const { orderId, customerId, amount, totalAmount, customerName } = location.state || {};
 
   const [loading, setLoading] = useState(false);
   const [paid, setPaid] = useState(false);
 
-  // If someone opens /payment directly without booking
-  // redirect them to booking page
   if (!orderId) {
     return (
-      <div className="payment-error">
-        <h2>❌ No booking found!</h2>
-        <p>Please complete booking first</p>
-        <button onClick={() => navigate('/booking')}>
-          Go to Booking
-        </button>
+      <div className="payment-empty page-enter">
+        <div className="payment-empty__box">
+          <span className="payment-empty__icon"><ClipboardList size={64} /></span>
+          <h2>No Booking Found</h2>
+          <p>Please complete a booking first to proceed to payment.</p>
+          <button className="btn btn--primary btn--lg" onClick={() => navigate('/booking')}>
+            Go to Booking
+          </button>
+        </div>
       </div>
     );
   }
 
-  // ── HANDLE RAZORPAY PAYMENT ──
   async function handlePayment() {
     setLoading(true);
-
-    // get token from localStorage
-    const token = localStorage.getItem('token');
-
-
     try {
-      // Step 1 — Create Razorpay order in backend
-      const response = await axios.post(
-        'http://localhost:5000/payments/create-order',
-        {
-          amount: amount,
-          order_id: orderId,
-          customer_id: customerId
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      /* /payments/create-order requires auth token */
+      const res = await axios.post('http://localhost:5000/payments/create-order', {
+        amount, order_id: orderId, customer_id: customerId,
+      }, getAuthHeaders());
 
-      const razorpayOrderId = response.data.razorpay_order_id;
-
-      // Step 2 — Open Razorpay payment popup
-      // Razorpay script must be loaded in public/index.html
       const options = {
         key: process.env.REACT_APP_RAZORPAY_KEY_ID,
-        amount: amount * 100,        // amount in paise
+        amount: amount * 100,
         currency: 'INR',
-        name: 'Mannat Catering',
+        name: 'Mannat Caterers',
         description: `Advance payment for Order #${orderId}`,
-        order_id: razorpayOrderId,
-
-        // This function runs when payment is SUCCESSFUL
-        handler: async function (paymentResponse) {
-
-          // Step 3 — Verify payment in backend
+        order_id: res.data.razorpay_order_id,
+        handler: async function(paymentRes) {
+          /* /payments/verify requires auth token */
           await axios.post('http://localhost:5000/payments/verify', {
-            razorpay_order_id: paymentResponse.razorpay_order_id,
-            razorpay_payment_id: paymentResponse.razorpay_payment_id
-          });
-
-          // Show success message
+            razorpay_order_id: paymentRes.razorpay_order_id,
+            razorpay_payment_id: paymentRes.razorpay_payment_id,
+          }, getAuthHeaders());
           setPaid(true);
           setLoading(false);
         },
-
-        prefill: {
-          name: customerName,
-        },
-        theme: {
-          color: '#4a0080'  // purple theme for popup
-        }
+        prefill: { name: customerName },
+        theme: { color: '#16a34a' },
       };
 
-      // Open the Razorpay popup
-      const razorpayPopup = new window.Razorpay(options);
-      razorpayPopup.open();
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
       setLoading(false);
-
-    } catch (error) {
-      console.log("Payment error:", error);
+    } catch (err) {
+      console.log("Payment error:", err);
       setLoading(false);
-      alert('Payment setup failed. Please try again!');
+      alert('Payment setup failed. Please try again.');
     }
   }
 
-  // ── SHOW SUCCESS PAGE AFTER PAYMENT ──
   if (paid) {
     return (
-      <div className="payment-success">
-        <div className="success-box">
-          <div className="success-icon">🎉</div>
-          <h2>Payment Successful!</h2>
-          <p>Thank you <strong>{customerName}</strong>!</p>
-          <p>Your booking has been confirmed.</p>
-          <p>Order ID: <strong>#{orderId}</strong></p>
-          <p>Amount Paid: <strong>₹{amount}</strong></p>
-          <button
-            className="home-btn"
-            onClick={() => navigate('/')}
-          >
-            Back to Home
-          </button>
+      <>
+        <Helmet><title>Payment Successful — Mannat Caterers</title></Helmet>
+        <div className="payment-success page-enter">
+          <div className="payment-success__box">
+            <div className="payment-success__check">
+              <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h2>Payment Successful!</h2>
+            <p>Thank you, <strong>{customerName}</strong>. Your event booking has been confirmed.</p>
+            <div className="payment-success__details">
+              <div className="payment-success__row"><span>Order ID</span><strong>#{orderId}</strong></div>
+              <div className="payment-success__row"><span>Amount Paid</span><strong>₹{amount.toLocaleString()}</strong></div>
+            </div>
+            <button className="btn btn--primary btn--lg" onClick={() => navigate('/')}>
+              Back to Home
+            </button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="payment-page">
+    <>
+      <Helmet>
+        <title>Complete Payment — Mannat Caterers</title>
+        <meta name="description" content="Securely pay your advance payment for your Mannat Caterers event booking." />
+      </Helmet>
 
-      {/* ── HEADER ── */}
-      <div className="payment-header">
-        <h1>Complete Payment 💳</h1>
-        <p>Secure advance payment for your event</p>
+      <div className="payment-page page-enter">
+
+        <section className="payment-hero">
+          <div className="container">
+            <h1>Complete Your Payment</h1>
+            <p>Secure advance payment powered by Razorpay</p>
+          </div>
+        </section>
+
+        <section className="payment-content">
+          <div className="container">
+            <div className="payment-card">
+              <div className="payment-card__header">
+                <svg width="32" height="32" fill="none" stroke="var(--green-600)" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <h2>Booking Summary</h2>
+              </div>
+
+              <div className="payment-card__row">
+                <span>Customer</span>
+                <strong>{customerName}</strong>
+              </div>
+              <div className="payment-card__row">
+                <span>Order ID</span>
+                <strong>#{orderId}</strong>
+              </div>
+              <div className="payment-card__row">
+                <span>Total Amount</span>
+                <strong>₹{totalAmount.toLocaleString()}</strong>
+              </div>
+              <div className="payment-card__row payment-card__row--highlight">
+                <span>Advance to Pay (30%)</span>
+                <strong>₹{amount.toLocaleString()}</strong>
+              </div>
+              <div className="payment-card__row">
+                <span>Balance (on event day)</span>
+                <strong>₹{(totalAmount - amount).toLocaleString()}</strong>
+              </div>
+
+              <button className="btn btn--primary btn--lg btn--full payment-card__btn" onClick={handlePayment} disabled={loading}>
+                {loading ? 'Processing...' : `Pay ₹${amount.toLocaleString()} Now`}
+              </button>
+
+              <p className="payment-card__secure">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                100% Secure Payment · SSL Encrypted
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
-
-      <div className="payment-content">
-
-        {/* ── ORDER SUMMARY ── */}
-        <div className="payment-card">
-          <h2>📋 Booking Summary</h2>
-
-          <div className="summary-row">
-            <span>Customer Name</span>
-            <strong>{customerName}</strong>
-          </div>
-
-          <div className="summary-row">
-            <span>Order ID</span>
-            <strong>#{orderId}</strong>
-          </div>
-
-          <div className="summary-row">
-            <span>Total Amount</span>
-            <strong>₹{totalAmount}</strong>
-          </div>
-
-          <div className="summary-row highlight">
-            <span>Advance to Pay (30%)</span>
-            <strong>₹{amount}</strong>
-          </div>
-
-          <div className="summary-row">
-            <span>Balance (pay on event day)</span>
-            <strong>₹{totalAmount - amount}</strong>
-          </div>
-
-          {/* Pay button */}
-          <button
-            className="pay-btn"
-            onClick={handlePayment}
-            disabled={loading}
-          >
-            {loading ? 'Processing...' : `Pay ₹${amount} Now 🔒`}
-          </button>
-
-          <p className="secure-text">
-            🔒 100% Secure Payment powered by Razorpay
-          </p>
-        </div>
-
-      </div>
-    </div>
+    </>
   );
 }
 
