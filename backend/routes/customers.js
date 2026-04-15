@@ -91,12 +91,14 @@ router.post('/add', function(req, res) {
     });
 });
 
+const verifyToken = require('../middleware/auth');
+
 // =============================================
 // ROUTE 2 — Get ALL customers (admin only)
 // GET means we are FETCHING data from server
 // This runs when Admin page loads
 // =============================================
-router.get('/all', function(req, res) {
+router.get('/all', verifyToken, function(req, res) {
     // SQL query to get all customers
     // ORDER BY created_at DESC = newest customer first
     const sql = 'SELECT * FROM customers ORDER BY created_at DESC';

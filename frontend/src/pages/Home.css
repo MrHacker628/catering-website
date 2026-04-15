@@ -373,7 +373,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   REVIEWS / TESTIMONIALS
+   REVIEWS / TESTIMONIALS — Trustindex Widget
 ══════════════════════════════════════════════════════════════ */
 .reviews {
   padding: var(--space-4xl) 0;
@@ -381,68 +381,12 @@
   text-align: center;
 }
 
-.reviews__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-lg);
-  text-align: left;
-}
-
-.review-card {
-  background: var(--gray-50);
-  border: 1px solid var(--gray-100);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  transition: all var(--transition-base);
-}
-
-.review-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--green-200);
-}
-
-.review-card__stars {
-  display: flex;
-  gap: 2px;
-  margin-bottom: var(--space-md);
-}
-
-.star {
-  color: var(--gold);
-  font-size: 16px;
-}
-
-.review-card blockquote {
-  font-size: 15px;
-  font-style: italic;
-  color: var(--gray-600);
-  line-height: 1.7;
-  margin-bottom: var(--space-lg);
-}
-
-.review-card__author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.review-card__author img {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.review-card__author strong {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--gray-800);
-}
-
-.review-card__author span {
-  font-size: 12px;
-  color: var(--green-600);
+/* Trustindex widget container — must have auto height and no overflow clipping */
+.trustindex-container {
+  height: auto;
+  overflow: visible;
+  margin-top: var(--space-xl);
+  min-height: 200px;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -459,7 +403,6 @@
 
   .services__grid { grid-template-columns: 1fr; }
   .portfolio__grid { grid-template-columns: repeat(2, 1fr); }
-  .reviews__grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {

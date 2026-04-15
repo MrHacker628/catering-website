@@ -29,7 +29,7 @@ const categoryImages = {
 
 const menuCategories = ['All', 'Veg Thali', 'Non-Veg Thali', 'Biryani', 'Starters', 'Desserts', 'Beverages'];
 
-function Booking({ currentUser }) {
+function Booking({ currentUser, onLoginClick }) {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
 
@@ -154,6 +154,12 @@ function Booking({ currentUser }) {
 
   /* ── Submit Booking ── */
   async function submitBooking() {
+    if (!localStorage.getItem('token')) {
+      setSubmitMsg('Please log in or sign up to complete your booking.');
+      if (onLoginClick) onLoginClick();
+      return;
+    }
+
     if (billing.total <= 0) {
       setSubmitMsg('No items selected');
       return;

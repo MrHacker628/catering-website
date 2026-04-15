@@ -59,7 +59,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/menu" element={<Menu />} />
-            <Route path="/booking" element={<Booking currentUser={currentUser} />} />
+            <Route path="/booking" element={<Booking currentUser={currentUser} onLoginClick={() => setShowAuthModal(true)} />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/admin" element={<Admin />} />
           </Routes>

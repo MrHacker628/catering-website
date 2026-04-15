@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Heart, Building2, Gift, GlassWater } from 'lucide-react';
@@ -37,13 +37,35 @@ const portfolio = [
   { id: 6, title: 'Rustic Anniversary', category: 'Private', img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop', alt: 'Rustic anniversary dinner setup with candles and elegant table decorations' },
 ];
 
-const reviews = [
-  { name: 'Priya & Rajeev', event: 'Wedding', quote: 'Mannat turned our dream wedding into a culinary masterpiece. Every guest was absolutely delighted with the food.', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop' },
-  { name: 'Anil Desai', event: 'Corporate', quote: 'Flawless execution for our annual conference. Professional service and outstanding food quality throughout.', img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop' },
-  { name: 'Sneha Naik', event: 'Birthday', quote: 'They exceeded every expectation. The presentation was stunning and the flavors were absolutely incredible.', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop' },
-];
-
 const categories = ['All', 'Wedding', 'Corporate', 'Birthday', 'Private'];
+
+/* ── Trustindex Review Widget Component ── */
+function TrustindexWidget() {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+
+    // Check if script is already injected
+    const existingScript = node.querySelector('script[src*="trustindex.io"]');
+    if (existingScript) return;
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.trustindex.io/loader.js?090fbdd69ee47322f99693a00d1';
+    script.async = true;
+    script.defer = true;
+    node.appendChild(script);
+
+    return () => {
+      // Cleanup on unmount
+      const s = node.querySelector('script[src*="trustindex.io"]');
+      if (s) node.removeChild(s);
+    };
+  }, []);
+
+  return <div ref={containerRef} className="trustindex-container"></div>;
+}
 
 function Home() {
   const navigate = useNavigate();
@@ -187,29 +209,13 @@ function Home() {
           </div>
         </section>
 
-        {/* ══════════ TESTIMONIALS ══════════ */}
+        {/* ══════════ TESTIMONIALS — Trustindex Widget ══════════ */}
         <section className="reviews" aria-labelledby="reviews-heading">
           <div className="container">
             <div className="section-label">Testimonials</div>
             <h2 id="reviews-heading">Words from Our Clients</h2>
 
-            <div className="reviews__grid">
-              {reviews.map((r, i) => (
-                <article key={i} className="review-card">
-                  <div className="review-card__stars">
-                    {'★★★★★'.split('').map((s, j) => <span key={j} className="star">{s}</span>)}
-                  </div>
-                  <blockquote>"{r.quote}"</blockquote>
-                  <div className="review-card__author">
-                    <img src={r.img} alt={`Portrait of ${r.name}`} loading="lazy" />
-                    <div>
-                      <strong>{r.name}</strong>
-                      <span>{r.event}</span>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <TrustindexWidget />
           </div>
         </section>
 

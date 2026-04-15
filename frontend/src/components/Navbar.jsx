@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { User, Mail, MapPin } from 'lucide-react';
 import './Navbar.css';
 
 function Navbar({ currentUser, onLogout, onLoginClick }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+  const hoverTimeout = useRef(null);
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
@@ -23,7 +27,28 @@ function Navbar({ currentUser, onLogout, onLoginClick }) {
   // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
+    setProfileOpen(false);
   }, [location]);
+
+  // Close profile card when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  function handleProfileEnter() {
+    clearTimeout(hoverTimeout.current);
+    setProfileOpen(true);
+  }
+
+  function handleProfileLeave() {
+    hoverTimeout.current = setTimeout(() => setProfileOpen(false), 200);
+  }
 
   if (isAdmin) {
     return (
@@ -68,14 +93,62 @@ function Navbar({ currentUser, onLogout, onLoginClick }) {
           </Link>
 
           {currentUser ? (
-            <div className="navbar__user">
-              <div className="navbar__user-avatar">
+            <div
+              className="navbar__user"
+              ref={profileRef}
+              onMouseEnter={handleProfileEnter}
+              onMouseLeave={handleProfileLeave}
+            >
+              <div className="navbar__user-avatar" aria-label="User profile">
                 {currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'U'}
               </div>
               <span className="navbar__user-name">{currentUser.full_name}</span>
               <button className="navbar__auth-btn navbar__auth-btn--logout" onClick={onLogout}>
                 Logout
               </button>
+
+              {/* ── Profile Hover Card ── */}
+              {profileOpen && (
+                <div className="profile-card" role="tooltip" aria-label="User profile details">
+                  <div className="profile-card__arrow"></div>
+                  <div className="profile-card__header">
+                    <div className="profile-card__avatar">
+                      {currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div className="profile-card__greeting">
+                      <span className="profile-card__hello">Welcome back</span>
+                      <strong className="profile-card__name">{currentUser.full_name || 'User'}</strong>
+                    </div>
+                  </div>
+                  <div className="profile-card__divider"></div>
+                  <ul className="profile-card__details">
+                    <li>
+                      <User size={15} />
+                      <div>
+                        <span className="profile-card__label">Name</span>
+                        <span className="profile-card__value">{currentUser.full_name || '—'}</span>
+                      </div>
+                    </li>
+                    <li>
+                      <Mail size={15} />
+                      <div>
+                        <span className="profile-card__label">Email</span>
+                        <span className="profile-card__value">{currentUser.email || '—'}</span>
+                      </div>
+                    </li>
+                    <li>
+                      <MapPin size={15} />
+                      <div>
+                        <span className="profile-card__label">Address</span>
+                        <span className="profile-card__value">{currentUser.address || 'Not set'}</span>
+                      </div>
+                    </li>
+                  </ul>
+                  <button className="profile-card__logout" onClick={onLogout}>
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <button className="navbar__auth-btn navbar__auth-btn--login" onClick={onLoginClick}>

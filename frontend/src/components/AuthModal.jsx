@@ -1,25 +1,22 @@
-// AuthModal.jsx — Login/Signup popup modal
+// AuthModal.jsx — Login/Signup popup modal (Green Theme, No Tabs)
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import './AuthModal.css'; // Import CSS for styling
+import './AuthModal.css';
 
 
 function AuthModal({ onClose, onLoginSuccess }) {
 
-    // ── STEP 1: Variables (useState) ──
     // which form to show right now
     const [activeForm, setActiveForm] = useState('login'); // 'login' or 'signup'
 
     // ── LOGIN FORM DATA ──
-    // stores what user types in login form
     const [loginData, setLoginData] = useState({
         email: '',
         password: ''
     });
 
     // ── SIGNUP FORM DATA ──
-    // stores what user types in signup form
     const [signupData, setSignupData] = useState({
         fullName: '',
         email: '',
@@ -29,226 +26,185 @@ function AuthModal({ onClose, onLoginSuccess }) {
         confirmPassword: ''
     });
 
+    // ── ERROR & LOADING ──
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    // updates loginData when user types
-    // e.target.name  = which input changed
-    // e.target.value = what was typed
     function handleLoginChange(e) {
         setLoginData({ ...loginData, [e.target.name]: e.target.value });
-
-        console.log("Login data:", loginData);
     }
 
     // ── HANDLE LOGIN SUBMIT ──
-    // runs when Login button is clicked
     async function handleLogin(e) {
-        // STEP 1 — Clear any old error messages
         setError('');
 
-        // STEP 2 — Check if fields are empty
         if (!loginData.email || !loginData.password) {
             setError('Please fill all fields!');
-            return; // stop here — don't continue
+            return;
         }
 
-        // STEP 3 — Show loading
         setLoading(true);
 
-
         try {
-            // STEP 4 — Send login request to backend
             const response = await axios.post(
                 'http://localhost:5000/auth/login',
                 loginData
             );
 
-            // STEP 5 — Save token in localStorage
-            // localStorage keeps data even after browser closes!
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
 
             setLoading(false);
-
-            // STEP 6 — Tell parent component login worked
             onLoginSuccess(response.data.user);
-
-            // STEP 7 — Close the popup
             onClose();
 
         } catch (err) {
             setLoading(false);
-            // show error message from backend
             setError(err.response?.data?.message || 'Login failed!');
         }
     }
 
 
     // ── HANDLE SIGNUP SUBMIT ──
-    // runs when Sign Up button is clicked
     async function handleSignup() {
 
-        // STEP 1 — Clear old errors
         setError('');
 
-        // STEP 2 — Check if required fields are empty
-        // ! means NOT — so !signupData.fullName means "if name is empty"
         if (!signupData.fullName || !signupData.email ||
             !signupData.phone || !signupData.password) {
             setError('Please fill all required fields!');
             return;
         }
 
-        // STEP 3 — Check if passwords match
         if (signupData.password !== signupData.confirmPassword) {
             setError('Passwords do not match!');
             return;
         }
 
-        // STEP 4 — Check password length
         if (signupData.password.length < 6) {
             setError('Password must be at least 6 characters!');
             return;
         }
 
-        // STEP 5 — Show loading
         setLoading(true);
 
         try {
-            // STEP 6 — Send signup request to backend
             const response = await axios.post(
                 'http://localhost:5000/auth/signup',
                 signupData
             );
 
-            // STEP 7 — Save token and user in localStorage
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
 
             setLoading(false);
-
-            // STEP 8 — Tell parent login was successful
             onLoginSuccess(response.data.user);
-
-            // STEP 9 — Close popup
             onClose();
 
         } catch (err) {
             setLoading(false);
             setError(err.response?.data?.message || 'Signup failed!');
         }
-
-        console.log("Signup data:", signupData);
     }
 
-    // updates signupData when user types
     function handleSignupChange(e) {
         setSignupData({ ...signupData, [e.target.name]: e.target.value });
     }
 
-    // ── ERROR MESSAGE ──
-    const [error, setError] = useState('');
-
-    // ── LOADING STATE ──
-    const [loading, setLoading] = useState(false);
-
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            {/* MODAL BOX — white box in center */}
-            {/* stopPropagation stops click from reaching overlay */}
-            <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <div className="auth-overlay" onClick={onClose}>
+            <div className="auth-box" onClick={(e) => e.stopPropagation()}>
 
-                {/* CLOSE BUTTON — top right X */}
-                <button className="modal-close" onClick={onClose}>✕</button>
+                {/* CLOSE BUTTON */}
+                <button className="auth-close" onClick={onClose}>✕</button>
 
-                {/* TAB SWITCHER — Login / Sign Up buttons */}
-                <div className="modal-tabs">
-                    {/* 
-                        when clicked → setActiveForm changes to 'login' or 'signup'
-                        activeForm === 'login' ? 'active' : ''
-                        means IF activeForm is login → add active class (purple)
-                        IF not → no class (grey)
-                    */}
-
-                    <button className={activeForm === 'login' ? 'active' : ''} onClick={() => setActiveForm('login')}>Login</button>
-                    <button className={activeForm === 'signup' ? 'active' : ''} onClick={() => setActiveForm('signup')}>Sign Up</button>
-                </div>
-
-                {/* only show login form when activeForm === 'login' */}
+                {/* ── LOGIN FORM (default view — no tabs) ── */}
                 {activeForm === 'login' && (
 
-                    < div className="modal-form">
-                        {/* LOGIN FORM — shown by default */}
+                    <div className="auth-form">
+                        {/* Icon */}
+                        <div className="auth-icon">
+                            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        </div>
+
                         <h2>Welcome Back</h2>
                         <p>Login to your account to continue</p>
 
-                        {/* show error if any */}
-                        {error && <p className="modal-error">❌ {error}</p>}
+                        {error && <p className="auth-error">❌ {error}</p>}
 
-                        <div className="modal-group">
-                            <label>Email</label>
-                            <input type="email" name="email" value={loginData.email} onChange={handleLoginChange} placeholder="Enter your email" />
+                        <div className="auth-group">
+                            <label htmlFor="login-email">Email</label>
+                            <input id="login-email" type="email" name="email" value={loginData.email} onChange={handleLoginChange} placeholder="Enter your email" />
                         </div>
 
-                        <div className="modal-group">
-                            <label>Password</label>
-                            <input type="password" name="password" value={loginData.password} onChange={handleLoginChange} placeholder="Enter your password" />
+                        <div className="auth-group">
+                            <label htmlFor="login-password">Password</label>
+                            <input id="login-password" type="password" name="password" value={loginData.password} onChange={handleLoginChange} placeholder="Enter your password"
+                                onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
                         </div>
 
-                        <button className="modal-btn" onClick={handleLogin}
-                            disabled={loading}>{loading ? 'Logging in...' : 'Login 🔓'}</button>
+                        <button className="auth-btn" onClick={handleLogin}
+                            disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
 
-                        <p className="modal-switch">
-                            Don't have an account? <span>Sign Up here</span>
+                        <p className="auth-switch">
+                            Don't have an account?{' '}
+                            <span onClick={() => { setActiveForm('signup'); setError(''); }}>
+                                Sign Up here
+                            </span>
                         </p>
                     </div>
                 )}
 
 
-                {/* only show signup form when activeForm === 'signup' */}
+                {/* ── SIGNUP FORM ── */}
                 {activeForm === 'signup' && (
-                    <div className="modal-form">
-                        <h2>Create Account 🎉</h2>
-                        <p>Join Mannat Catering today!</p>
-
-                        {/* show error if any */}
-                        {error && <p className="modal-error">❌ {error}</p>}
-
-                        <div className="modal-group">
-                            <label>Full Name *</label>
-                            <input type="text" name="fullName" value={signupData.fullName} onChange={handleSignupChange} placeholder="Enter your full name" />
+                    <div className="auth-form">
+                        {/* Icon */}
+                        <div className="auth-icon auth-icon--signup">
+                            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                         </div>
 
-                        <div className="modal-group">
-                            <label>Email *</label>
-                            <input type="email" name="email" value={signupData.email} onChange={handleSignupChange} placeholder="Enter your email" />
+                        <h2>Create Account</h2>
+                        <p>Join Mannat Caterers today!</p>
+
+                        {error && <p className="auth-error">❌ {error}</p>}
+
+                        <div className="auth-group">
+                            <label htmlFor="signup-name">Full Name *</label>
+                            <input id="signup-name" type="text" name="fullName" value={signupData.fullName} onChange={handleSignupChange} placeholder="Enter your full name" />
                         </div>
 
-                        <div className="modal-group">
-                            <label>Phone *</label>
-                            <input type="text" name="phone" value={signupData.phone} onChange={handleSignupChange} placeholder="Enter your phone number" />
+                        <div className="auth-group">
+                            <label htmlFor="signup-email">Email *</label>
+                            <input id="signup-email" type="email" name="email" value={signupData.email} onChange={handleSignupChange} placeholder="Enter your email" />
                         </div>
 
-                        <div className="modal-group">
-                            <label>Address</label>
-                            <input type="text" name="address" value={signupData.address} onChange={handleSignupChange} placeholder="Enter your address" />
+                        <div className="auth-group">
+                            <label htmlFor="signup-phone">Phone *</label>
+                            <input id="signup-phone" type="text" name="phone" value={signupData.phone} onChange={handleSignupChange} placeholder="Enter your phone number" />
                         </div>
 
-                        <div className="modal-group">
-                            <label>Password *</label>
-                            <input type="password" name="password" value={signupData.password} onChange={handleSignupChange} placeholder="Min 6 characters" />
+                        <div className="auth-group">
+                            <label htmlFor="signup-address">Address</label>
+                            <input id="signup-address" type="text" name="address" value={signupData.address} onChange={handleSignupChange} placeholder="Enter your address" />
                         </div>
 
-                        <div className="modal-group">
-                            <label>Confirm Password *</label>
-                            <input type="password" name="confirmPassword" value={signupData.confirmPassword} onChange={handleSignupChange} placeholder="Repeat your password" />
+                        <div className="auth-group">
+                            <label htmlFor="signup-password">Password *</label>
+                            <input id="signup-password" type="password" name="password" value={signupData.password} onChange={handleSignupChange} placeholder="Min 6 characters" />
                         </div>
 
-                        <button className="modal-btn" onClick={handleSignup}
-                            disabled={loading}>{loading ? 'Creating account...' : 'Sign Up 🎉'}</button>
+                        <div className="auth-group">
+                            <label htmlFor="signup-confirm">Confirm Password *</label>
+                            <input id="signup-confirm" type="password" name="confirmPassword" value={signupData.confirmPassword} onChange={handleSignupChange} placeholder="Repeat your password" />
+                        </div>
 
-                        <p className="modal-switch">
+                        <button className="auth-btn" onClick={handleSignup}
+                            disabled={loading}>{loading ? 'Creating account...' : 'Sign Up'}</button>
+
+                        <p className="auth-switch">
                             Already have an account?{' '}
-                            <span onClick={() => setActiveForm('login')}>
+                            <span onClick={() => { setActiveForm('login'); setError(''); }}>
                                 Login here
                             </span>
                         </p>
@@ -256,9 +212,7 @@ function AuthModal({ onClose, onLoginSuccess }) {
                 )}
 
             </div>
-        </div >
-
-
+        </div>
     )
 };
 
