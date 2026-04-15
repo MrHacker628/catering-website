@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { BarChart, Package, Calendar, Users, CreditCard, DollarSign, TrendingUp, Trash2 } from 'lucide-react';
 import './Admin.css';
 
 function Admin() {
@@ -97,11 +98,11 @@ function Admin() {
   }
 
   const tabs = [
-    { key: 'analytics', label: 'Analytics', icon: '📊' },
-    { key: 'inventory', label: 'Inventory', icon: '📦' },
-    { key: 'bookings', label: 'Bookings', icon: '📅' },
-    { key: 'customers', label: 'Customers', icon: '👥' },
-    { key: 'payments', label: 'Payments', icon: '💳' },
+    { key: 'analytics', label: 'Analytics', icon: <BarChart size={18} /> },
+    { key: 'inventory', label: 'Inventory', icon: <Package size={18} /> },
+    { key: 'bookings', label: 'Bookings', icon: <Calendar size={18} /> },
+    { key: 'customers', label: 'Customers', icon: <Users size={18} /> },
+    { key: 'payments', label: 'Payments', icon: <CreditCard size={18} /> },
   ];
 
   return (
@@ -132,11 +133,11 @@ function Admin() {
           <div className="admin__section">
             <div className="stats-grid">
               {[
-                { label: 'Total Bookings', value: orders.length, icon: '📅', color: 'blue' },
-                { label: 'Total Revenue', value: `₹${totalRev.toLocaleString()}`, icon: '💰', color: 'green' },
-                { label: 'Customers', value: customers.length, icon: '👥', color: 'purple' },
-                { label: 'Avg Order Value', value: `₹${avgOrder.toFixed(0)}`, icon: '📈', color: 'orange' },
-                { label: 'Payments Done', value: successPay, icon: '💳', color: 'green' },
+                { label: 'Total Bookings', value: orders.length, icon: <Calendar size={24} />, color: 'blue' },
+                { label: 'Total Revenue', value: `₹${totalRev.toLocaleString()}`, icon: <DollarSign size={24} />, color: 'green' },
+                { label: 'Customers', value: customers.length, icon: <Users size={24} />, color: 'purple' },
+                { label: 'Avg Order Value', value: `₹${avgOrder.toFixed(0)}`, icon: <TrendingUp size={24} />, color: 'orange' },
+                { label: 'Payments Done', value: successPay, icon: <CreditCard size={24} />, color: 'green' },
               ].map((s, i) => (
                 <div className="stat-card" key={i}>
                   <div className={`stat-card__icon stat-card__icon--${s.color}`}>{s.icon}</div>
@@ -217,7 +218,7 @@ function Admin() {
                           {item.quantity <= item.minimum_stock ? 'Low Stock' : 'OK'}
                         </span>
                       </td>
-                      <td><button className="btn-icon btn-icon--danger" onClick={() => deleteItem(item.id)}>🗑️</button></td>
+                      <td><button className="btn-icon btn-icon--danger" onClick={() => deleteItem(item.id)}><Trash2 size={16} /></button></td>
                     </tr>
                   ))}
                 </tbody>

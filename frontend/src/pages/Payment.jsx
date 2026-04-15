@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
+import { ClipboardList } from 'lucide-react';
 import './Payment.css';
 
 function Payment() {
@@ -16,7 +17,7 @@ function Payment() {
     return (
       <div className="payment-empty page-enter">
         <div className="payment-empty__box">
-          <span className="payment-empty__icon">📋</span>
+          <span className="payment-empty__icon"><ClipboardList size={64} /></span>
           <h2>No Booking Found</h2>
           <p>Please complete a booking first to proceed to payment.</p>
           <button className="btn btn--primary btn--lg" onClick={() => navigate('/booking')}>

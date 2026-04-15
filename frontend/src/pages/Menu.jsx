@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
+import { Utensils } from 'lucide-react';
 import './Menu.css';
 
 const categories = ['All', 'Veg Thali', 'Non-Veg Thali', 'Biryani', 'Starters', 'Desserts', 'Beverages', 'Custom Package'];
@@ -91,7 +92,7 @@ function Menu() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="menu-empty">
-                <span>🍽️</span>
+                <span><Utensils size={48} /></span>
                 <p>No items found in this category.</p>
               </div>
             ) : (

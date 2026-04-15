@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { Heart, Building2, Gift, GlassWater } from 'lucide-react';
 import './Home.css';
 
 /* ── Static Data ── */
 const services = [
   {
-    id: 1, icon: '💒', name: 'Wedding Catering',
+    id: 1, icon: <Heart size={28} />, name: 'Wedding Catering',
     desc: 'Curate a bespoke culinary journey for your most cherished day, from intimate ceremonies to grand receptions.',
     price: 'From ₹50,000'
   },
   {
-    id: 2, icon: '🏢', name: 'Corporate Events',
+    id: 2, icon: <Building2 size={28} />, name: 'Corporate Events',
     desc: 'Professional catering solutions for conferences, seminars, and team celebrations that leave a lasting impression.',
     price: 'From ₹25,000'
   },
   {
-    id: 3, icon: '🎂', name: 'Birthday Celebrations',
+    id: 3, icon: <Gift size={28} />, name: 'Birthday Celebrations',
     desc: 'From milestone birthdays to surprise parties — we craft menus that make every age feel celebrated.',
     price: 'From ₹12,000'
   },
   {
-    id: 4, icon: '🥂', name: 'Private Dining',
+    id: 4, icon: <GlassWater size={28} />, name: 'Private Dining',
     desc: 'Intimate gatherings deserve exceptional flavors. Custom menus for anniversaries, reunions, and special occasions.',
     price: 'From ₹18,000'
   },
