@@ -1,184 +1,149 @@
-/* ═══════════════════════════════════════════════════════════════
-   PAYMENT PAGE — Green Theme
-   ═══════════════════════════════════════════════════════════════ */
+ /* Payment.css */
 
-.payment-hero {
-  padding: 120px 0 40px;
+.payment-page {
+  min-height: 100vh;
+  background-color: #f9f0ff;
+}
+
+/* ── HEADER ── */
+.payment-header {
+  background: linear-gradient(135deg, #4a0080, #8b00ff);
+  color: white;
+  padding: 50px 40px;
   text-align: center;
-  background: linear-gradient(135deg, var(--green-50), var(--white));
 }
 
-.payment-hero h1 {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  margin-bottom: 8px;
-}
+.payment-header h1 { font-size: 36px; margin-bottom: 10px; }
 
-.payment-hero p {
-  color: var(--gray-500);
-  font-size: 16px;
-  margin: 0 auto;
-}
-
+/* ── CONTENT ── */
 .payment-content {
-  padding: var(--space-2xl) 0 var(--space-4xl);
-  background: var(--gray-50);
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
 
-/* Card */
+/* ── PAYMENT CARD ── */
 .payment-card {
-  max-width: 480px;
-  margin: 0 auto;
-  background: var(--white);
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-xl);
-  padding: var(--space-2xl);
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
 }
 
-.payment-card__header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: var(--space-xl);
-  padding-bottom: var(--space-md);
-  border-bottom: 1px solid var(--gray-100);
+.payment-card h2 {
+  color: #4a0080;
+  margin-bottom: 25px;
+  font-size: 22px;
 }
 
-.payment-card__header h2 {
-  font-size: 20px;
-  margin: 0;
-}
-
-.payment-card__row {
+/* Summary rows */
+.summary-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--gray-100);
-  font-size: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0e0ff;
+  font-size: 15px;
 }
 
-.payment-card__row span { color: var(--gray-500); }
-.payment-card__row strong { color: var(--gray-800); }
+.summary-row span { color: #666; }
+.summary-row strong { color: #333; }
 
-.payment-card__row--highlight {
-  background: var(--green-50);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  margin: 8px -16px;
+/* highlighted row for advance amount */
+.summary-row.highlight {
+  background: #f0e0ff;
+  padding: 12px 15px;
+  border-radius: 10px;
   border-bottom: none;
+  margin: 10px 0;
 }
 
-.payment-card__row--highlight strong {
-  font-family: var(--font-serif);
+.summary-row.highlight strong { color: #4a0080; font-size: 18px; }
+
+/* Pay button */
+.pay-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #4a0080, #8b00ff);
+  color: white;
+  border: none;
+  border-radius: 12px;
   font-size: 18px;
-  color: var(--green-700);
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 25px;
+  transition: opacity 0.3s;
 }
 
-.payment-card__btn {
-  margin-top: var(--space-xl);
+.pay-btn:hover { opacity: 0.9; }
+.pay-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.secure-text {
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+  margin-top: 15px;
 }
 
-.payment-card__secure {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: var(--space-md);
-  font-size: 12px;
-  color: var(--gray-400);
-}
-
-/* ── Success ── */
+/* ── SUCCESS PAGE ── */
 .payment-success {
   min-height: 100vh;
+  background: #f9f0ff;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-lg);
-  background: var(--gray-50);
 }
 
-.payment-success__box {
-  max-width: 420px;
-  width: 100%;
-  background: var(--white);
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-xl);
-  padding: var(--space-2xl);
+.success-box {
+  background: white;
+  border-radius: 20px;
+  padding: 50px 40px;
   text-align: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  max-width: 400px;
 }
 
-.payment-success__check {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto var(--space-lg);
-  background: var(--green-50);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--green-600);
+.success-icon { font-size: 60px; margin-bottom: 20px; }
+
+.success-box h2 {
+  color: #4a0080;
+  font-size: 28px;
+  margin-bottom: 15px;
 }
 
-.payment-success__box h2 {
-  font-size: 24px;
-  margin-bottom: var(--space-sm);
-  color: var(--green-700);
+.success-box p {
+  color: #555;
+  margin-bottom: 10px;
+  font-size: 16px;
 }
 
-.payment-success__box > p {
-  font-size: 15px;
-  color: var(--gray-600);
-  margin-bottom: var(--space-xl);
+.home-btn {
+  margin-top: 25px;
+  padding: 14px 35px;
+  background: #4a0080;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-.payment-success__details {
-  background: var(--gray-50);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  margin-bottom: var(--space-xl);
-}
-
-.payment-success__row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 14px;
-}
-
-.payment-success__row span { color: var(--gray-500); }
-.payment-success__row strong { color: var(--gray-800); }
-
-/* ── Empty/Error ── */
-.payment-empty {
+/* ── ERROR PAGE ── */
+.payment-error {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-lg);
-  background: var(--gray-50);
+  gap: 15px;
 }
 
-.payment-empty__box {
-  max-width: 400px;
-  text-align: center;
-}
-
-.payment-empty__icon {
-  font-size: 48px;
-  display: block;
-  margin-bottom: var(--space-md);
-}
-
-.payment-empty__box h2 {
-  margin-bottom: var(--space-sm);
-}
-
-.payment-empty__box p {
-  color: var(--gray-500);
-  margin-bottom: var(--space-xl);
-}
-
-@media (max-width: 480px) {
-  .payment-card { padding: var(--space-lg); }
+.payment-error button {
+  padding: 12px 30px;
+  background: #4a0080;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
 }
