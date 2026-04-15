@@ -36,11 +36,8 @@
   margin: 0 auto;
 }
 
-/* ── Sticky Filter Bar ── */
+/* ── Filter Bar ── */
 .menu-filter {
-  position: sticky;
-  top: var(--navbar-height);
-  z-index: 100;
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--gray-200);

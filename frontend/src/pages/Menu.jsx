@@ -163,10 +163,6 @@ function Menu() {
                     <span>Per Plate</span>
                     <strong>₹{selectedItem.price_per_plate}</strong>
                   </div>
-                  <div className="modal__price-row">
-                    <span>Per 100 Guests</span>
-                    <strong>₹{(selectedItem.price_per_plate * 100).toLocaleString()}</strong>
-                  </div>
                 </div>
 
                 <div className="modal__section">
