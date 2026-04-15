@@ -363,4 +363,279 @@
 @media (max-width: 480px) {
   .menu-grid { grid-template-columns: 1fr; }
   .modal__img { height: 180px; }
+/* ── PACKAGES SECTION ── */
+.packages-section {
+  padding: 50px 40px;
+  background: linear-gradient(135deg, #f8f0ff, #fff);
+}
+
+.packages-section h2 {
+  text-align: center;
+  font-size: 32px;
+  color: #4a0080;
+  margin-bottom: 10px;
+}
+
+.packages-subtitle {
+  text-align: center;
+  color: #888;
+  margin-bottom: 40px;
+  font-size: 16px;
+}
+
+/* ── PACKAGES GRID ── */
+.packages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── PACKAGE CARD ── */
+.package-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 5px 20px rgba(74, 0, 128, 0.1);
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.package-card:hover {
+  transform: translateY(-5px);
+  border-color: #4a0080;
+  box-shadow: 0 10px 30px rgba(74, 0, 128, 0.2);
+}
+
+/* ── PACKAGE BADGES ── */
+.package-badge {
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.badge-standard {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-premium {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.badge-special {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+/* ── PACKAGE INFO ── */
+.package-card h3 {
+  color: #4a0080;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.package-info {
+  margin-bottom: 15px;
+}
+
+.package-info p {
+  color: #666;
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+/* ── PACKAGE PRICING ── */
+.package-pricing {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.price-option {
+  flex: 1;
+  background: #f8f0ff;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+
+.guest-count {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.price-amount {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #4a0080;
+}
+
+.per-plate {
+  display: block;
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 2px;
+}
+
+.view-details-btn {
+  width: 100%;
+  padding: 10px;
+  background: #4a0080;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.view-details-btn:hover { background: #6a00b0; }
+
+/* ── PACKAGE DETAIL POPUP ── */
+.package-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.package-detail {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.detail-close {
+  position: absolute;
+  top: 15px; right: 20px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+
+.package-detail h2 {
+  color: #4a0080;
+  font-size: 22px;
+  margin: 10px 0;
+}
+
+.detail-info {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 15px 0;
+}
+
+.detail-info span {
+  background: #f0e0ff;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #4a0080;
+}
+
+.detail-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.detail-section h4 {
+  color: #4a0080;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.item-tag {
+  background: #f0e0ff;
+  color: #4a0080;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 13px;
+}
+
+/* ── DETAIL PRICING ── */
+.detail-pricing {
+  display: flex;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.detail-price-option {
+  flex: 1;
+  background: #f8f0ff;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+}
+
+.detail-price-option h4 {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.big-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #4a0080;
+  margin: 5px 0;
+}
+
+.book-package-btn {
+  width: 100%;
+  padding: 15px;
+  background: #4a0080;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 10px;
+}
+
+.book-package-btn:hover { background: #6a00b0; }
+
+/* ── MENU ITEMS SECTION ── */
+.menu-items-section {
+  padding: 50px 40px;
+}
+
+.menu-items-section h2 {
+  text-align: center;
+  font-size: 28px;
+  color: #4a0080;
+  margin-bottom: 30px;
 }

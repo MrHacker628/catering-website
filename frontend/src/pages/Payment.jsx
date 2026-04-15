@@ -30,10 +30,26 @@ function Payment() {
 
   async function handlePayment() {
     setLoading(true);
+
+    // get token from localStorage
+    const token = localStorage.getItem('token');
+
+
     try {
-      const res = await axios.post('http://localhost:5000/payments/create-order', {
-        amount, order_id: orderId, customer_id: customerId,
-      });
+      // Step 1 — Create Razorpay order in backend
+      const response = await axios.post(
+        'http://localhost:5000/payments/create-order',
+        {
+          amount: amount,
+          order_id: orderId,
+          customer_id: customerId
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      const razorpayOrderId = response.data.razorpay_order_id;
 
       const options = {
         key: process.env.REACT_APP_RAZORPAY_KEY_ID,
@@ -41,8 +57,12 @@ function Payment() {
         currency: 'INR',
         name: 'Mannat Caterers',
         description: `Advance payment for Order #${orderId}`,
-        order_id: res.data.razorpay_order_id,
-        handler: async function(paymentRes) {
+        order_id: razorpayOrderId,
+
+        // This function runs when payment is SUCCESSFUL
+        handler: async function (paymentResponse) {
+
+          // Step 3 — Verify payment in backend
           await axios.post('http://localhost:5000/payments/verify', {
             razorpay_order_id: paymentRes.razorpay_order_id,
             razorpay_payment_id: paymentRes.razorpay_payment_id,
@@ -83,6 +103,20 @@ function Payment() {
               Back to Home
             </button>
           </div>
+      <div className="payment-success">
+        <div className="success-box">
+          <div className="success-icon">🎉</div>
+          <h2>Payment Successful!</h2>
+          <p>Thank you <strong>{customerName}</strong>!</p>
+          <p>Your booking has been confirmed.</p>
+          <p>Order ID: <strong>#{orderId}</strong></p>
+          <p>Amount Paid: <strong>₹{amount}</strong></p>
+          <button
+            className="home-btn"
+            onClick={() => navigate('/')}
+          >
+            Back to Home
+          </button>
         </div>
       </>
     );
@@ -144,6 +178,21 @@ function Payment() {
             </div>
           </div>
         </section>
+
+          {/* Pay button */}
+          <button
+            className="pay-btn"
+            onClick={handlePayment}
+            disabled={loading}
+          >
+            {loading ? 'Processing...' : `Pay ₹${amount} Now 🔒`}
+          </button>
+
+          <p className="secure-text">
+            🔒 100% Secure Payment powered by Razorpay
+          </p>
+        </div>
+
       </div>
     </>
   );

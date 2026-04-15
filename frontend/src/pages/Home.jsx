@@ -46,12 +46,59 @@ const reviews = [
 const categories = ['All', 'Wedding', 'Corporate', 'Birthday', 'Private'];
 
 function Home() {
+// import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AuthModal from '../components/AuthModal';
+import './Home.css';
+
+
+
+function Home({ currentUser, onLoginSuccess, showAuthModal, setShowAuthModal }) {
+  // controls if modal is visible or not
+  const [showModal, setShowModal] = useState(false);
+  
+
+
+
+  // useNavigate lets us go to another page on button click
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('All');
 
   const filtered = activeFilter === 'All'
     ? portfolio
     : portfolio.filter(p => p.category === activeFilter);
+  return (
+    <div className="home">
+
+      {/* ── HERO SECTION ── big banner at the top */}
+      <div className="hero">
+        <div className="hero-content">
+          <h1>Welcome to Mannat Catering 🍽️</h1>
+          <p>Premium catering services for Weddings, Birthdays,
+            Corporate Events and all special occasions</p>
+
+          {/* Clicking this button goes to /booking page */}
+          <button className="hero-btn" onClick={() => navigate('/booking')}>
+            Book Now
+          </button>
+
+          {/* temporary button to test modal */}
+          <button className="hero-btn" onClick={() => setShowAuthModal(true)}>
+            Login / Sign Up
+          </button>
+
+          {/* Clicking this button goes to /menu page */}
+          <button className="hero-btn outline" onClick={() => navigate('/menu')}>
+            View Menu
+          </button>
+        </div>
+      </div>
+
+
+      {/* ── SERVICES SECTION ── 3 cards showing what we offer */}
+      <div className="services">
+        <h2>Our Services</h2>
 
   return (
     <>
@@ -215,6 +262,18 @@ function Home() {
 
       </div>
     </>
+
+      {/* only show modal if showModal is true */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onLoginSuccess={(user) => { 
+            onLoginSuccess(user); // update App.js state
+            setShowAuthModal(false); // close modal
+          }}
+        />
+      )}
+    </div>
   );
 }
 

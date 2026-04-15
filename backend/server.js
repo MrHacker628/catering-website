@@ -5,6 +5,8 @@ require('dotenv').config();
 
 const app = express();
 
+const verifyToken = require('./middleware/auth');
+
 // Middleware
 app.use(cors());        // allows React frontend to talk to this server
 app.use(express.json()); // allows server to read JSON data
@@ -31,7 +33,7 @@ const customerRoutes = require('./routes/customers');
 // Use the routes
 // This means all customer routes start with /customers
 // eg: /customers/add , /customers/all
-app.use('/customers', customerRoutes);
+app.use('/customers', verifyToken, customerRoutes);
 
 
 // Import inventory routes
@@ -39,7 +41,7 @@ const inventoryRoutes = require('./routes/inventory');
 
 // Use inventory routes
 // all inventory routes start with /inventory
-app.use('/inventory', inventoryRoutes);
+app.use('/inventory', verifyToken, inventoryRoutes);
 
 
 // Import menu routes
@@ -53,11 +55,22 @@ app.use('/menu', menuRoutes);
 const orderRoutes = require('./routes/orders');
 
 // Use orders routes
-app.use('/orders', orderRoutes);
+app.use('/orders', verifyToken, orderRoutes);
 
 
 // Import payment routes
 const paymentRoutes = require('./routes/payments');
 
 // Use payment routes
-app.use('/payments', paymentRoutes);
+app.use('/payments', verifyToken,paymentRoutes);
+
+
+// Import auth routes
+const authRoutes = require('./routes/auth');
+// Use auth routes
+app.use('/auth', authRoutes);
+
+
+const packageRoutes = require('./routes/packages');
+// packages are public — no token needed
+app.use('/packages', packageRoutes);

@@ -16,7 +16,6 @@ const db = require('../db');
 // =============================================
 router.post('/add', function(req, res) {
 
-    // Get all values sent from Booking form in React
     const { 
         customer_id, 
         event_type, 
@@ -29,30 +28,66 @@ router.post('/add', function(req, res) {
     } = req.body;
 
     // Calculate balance amount automatically
-    // balance = total - advance paid
     const balance_amount = total_amount - advance_amount;
 
-    const sql = `INSERT INTO orders 
-                (customer_id, event_type, event_date, event_location, 
-                num_of_guests, menu_selected, total_amount, 
-                advance_amount, balance_amount) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-    db.query(sql, [
-        customer_id, event_type, event_date, event_location,
-        num_of_guests, menu_selected, total_amount,
-        advance_amount, balance_amount
-    ], function(err, result) {
+    // STEP 1 — Start transaction
+    db.beginTransaction(function(err) {
 
         if (err) {
-            console.log("❌ Error placing order:", err);
-            res.status(500).json({ message: "Error placing order" });
-        } else {
-            res.status(200).json({ 
-                message: "✅ Order placed successfully!",
-                orderId: result.insertId // send back order id for payment
-            });
+            console.log("❌ Transaction start failed:", err);
+            res.status(500).json({ message: "Server error" });
+            return;
         }
+
+        console.log("🔄 Transaction started!");
+
+        // STEP 2 — Insert order
+        const sql = `INSERT INTO orders 
+                    (customer_id, event_type, event_date, event_location, 
+                    num_of_guests, menu_selected, total_amount, 
+                    advance_amount, balance_amount) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+        db.query(sql, [
+            customer_id, event_type, event_date, event_location,
+            num_of_guests, menu_selected, total_amount,
+            advance_amount, balance_amount
+        ], function(err, result) {
+
+            if (err) {
+                // ❌ Failed — rollback everything!
+                db.rollback(function() {
+                    console.log("❌ Order insert failed! Rolled back!");
+                    res.status(500).json({ 
+                        message: "Error placing order! All changes undone." 
+                    });
+                });
+                return;
+            }
+
+            console.log("✅ Order inserted! ID:", result.insertId);
+
+            // STEP 3 — Commit (save permanently)
+            db.commit(function(err) {
+
+                if (err) {
+                    db.rollback(function() {
+                        console.log("❌ Commit failed! Rolled back!");
+                        res.status(500).json({ 
+                            message: "Failed to complete booking!" 
+                        });
+                    });
+                    return;
+                }
+
+                // 🎉 SUCCESS!
+                console.log("✅ Transaction committed successfully!");
+                res.status(200).json({ 
+                    message: "✅ Order placed successfully!",
+                    orderId: result.insertId
+                });
+            });
+        });
     });
 });
 
