@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Heart, Building2, Gift, GlassWater } from 'lucide-react';
+import {
+  Heart, Building2, Gift, GlassWater,
+  ShieldCheck, UtensilsCrossed, CalendarCheck,
+  CreditCard, Package, LayoutDashboard, BarChart3,
+} from 'lucide-react';
 import './Home.css';
 
 /* ── Static Data ── */
@@ -39,6 +43,58 @@ const portfolio = [
 
 const categories = ['All', 'Wedding', 'Corporate', 'Birthday', 'Private'];
 
+const features = [
+  {
+    id: 1,
+    icon: <ShieldCheck size={30} />,
+    title: 'Secure Authentication',
+    desc: 'Sign up or log in with JWT-protected sessions. Your profile auto-fills booking forms so you never repeat yourself.',
+    color: '#16a34a',
+  },
+  {
+    id: 2,
+    icon: <UtensilsCrossed size={30} />,
+    title: 'Interactive Menu',
+    desc: 'Browse our full menu by category — Thalis, Biryani, Starters, Desserts & more — with live pricing and availability.',
+    color: '#0ea5e9',
+  },
+  {
+    id: 3,
+    icon: <CalendarCheck size={30} />,
+    title: 'Smart Booking Wizard',
+    desc: 'A guided 4-step booking flow: personal details → event info → menu selection → review. Live billing updates as you pick items.',
+    color: '#8b5cf6',
+  },
+  {
+    id: 4,
+    icon: <CreditCard size={30} />,
+    title: 'Razorpay Payments',
+    desc: 'Pay a 30% advance securely via Razorpay. Order status updates instantly on payment success — no manual follow-up needed.',
+    color: '#f59e0b',
+  },
+  {
+    id: 5,
+    icon: <Package size={30} />,
+    title: 'Catering Packages',
+    desc: 'Choose from Standard, Premium, or Mannat Special packages — pre-built for 500–600 guests with complete inclusions.',
+    color: '#ef4444',
+  },
+  {
+    id: 6,
+    icon: <LayoutDashboard size={30} />,
+    title: 'Admin Dashboard',
+    desc: 'Password-protected panel to manage bookings, update order statuses, track inventory with low-stock alerts, and view all payments.',
+    color: '#06b6d4',
+  },
+  {
+    id: 7,
+    icon: <BarChart3 size={30} />,
+    title: 'Live Analytics',
+    desc: 'Real-time revenue charts, total bookings, average order value, and a live activity feed — all in one clean dashboard.',
+    color: '#10b981',
+  },
+];
+
 /* ── Trustindex Review Widget Component ── */
 function TrustindexWidget() {
   const containerRef = useRef(null);
@@ -65,6 +121,72 @@ function TrustindexWidget() {
   }, []);
 
   return <div ref={containerRef} className="trustindex-container"></div>;
+}
+
+/* ── Features Slider Component ── */
+function FeaturesSlider() {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef(null);
+  const total = features.length;
+
+  const next = useCallback(() => setCurrent(c => (c + 1) % total), [total]);
+  const prev = () => setCurrent(c => (c - 1 + total) % total);
+
+  // Auto-advance every 3.5 s; reset timer on manual nav
+  useEffect(() => {
+    timerRef.current = setInterval(next, 3500);
+    return () => clearInterval(timerRef.current);
+  }, [next]);
+
+  const resetTimer = (fn) => {
+    clearInterval(timerRef.current);
+    fn();
+    timerRef.current = setInterval(next, 3500);
+  };
+
+  return (
+    <div className="fslider">
+      <div className="fslider__track-wrap">
+        <div
+          className="fslider__track"
+          style={{ transform: `translateX(calc(-${current} * (var(--fslider-card-w) + var(--fslider-gap))))` }}
+        >
+          {features.map((f, i) => (
+            <div
+              key={f.id}
+              className={`fslider__card ${i === current ? 'fslider__card--active' : ''}`}
+            >
+              <span className="fslider__icon" style={{ background: `${f.color}18`, color: f.color }}>
+                {f.icon}
+              </span>
+              <h3>{f.title}</h3>
+              <p>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Prev / Next */}
+      <button className="fslider__arrow fslider__arrow--prev" onClick={() => resetTimer(prev)} aria-label="Previous feature">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <button className="fslider__arrow fslider__arrow--next" onClick={() => resetTimer(next)} aria-label="Next feature">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+
+      {/* Dots */}
+      <div className="fslider__dots">
+        {features.map((_, i) => (
+          <button
+            key={i}
+            className={`fslider__dot ${i === current ? 'fslider__dot--active' : ''}`}
+            onClick={() => resetTimer(() => setCurrent(i))}
+            aria-label={`Go to feature ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function Home() {
@@ -162,6 +284,16 @@ function Home() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ══════════ FEATURES SLIDER ══════════ */}
+        <section className="features-section" aria-labelledby="features-heading">
+          <div className="container">
+            <div className="section-label">Platform Features</div>
+            <h2 id="features-heading">Everything You Need in One Place</h2>
+            <p className="section-subtitle">From browsing the menu to paying the advance — here's what powers your Mannat Caterers experience.</p>
+            <FeaturesSlider />
           </div>
         </section>
 
