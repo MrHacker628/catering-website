@@ -354,6 +354,141 @@
   font-style: italic;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PACKAGE CARDS
+   ══════════════════════════════════════════════════════════════ */
+.package-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-xl);
+  margin-top: var(--space-lg);
+}
+
+.package-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--gray-200);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  animation: fadeInUp 0.4s ease-out both;
+  display: flex;
+  flex-direction: column;
+}
+
+.package-card:hover {
+  border-color: var(--green-300);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+}
+
+.package-card__header {
+  padding: var(--space-xl);
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.package-card__header h3 {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--gray-900);
+  margin-right: 12px;
+}
+
+.package-tier {
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.package-tier--standard { background: var(--gray-200); color: var(--gray-700); }
+.package-tier--premium { background: var(--green-100); color: var(--green-800); }
+.package-tier--mannat-special { 
+  background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%); 
+  color: #7b5900; 
+  box-shadow: 0 2px 8px rgba(248, 181, 0, 0.25);
+}
+
+.package-card__body {
+  padding: var(--space-xl);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.package-card__desc {
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
+  flex-grow: 1;
+}
+
+.package-card__meta {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.package-card__meta span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-500);
+  padding: 4px 10px;
+  background: var(--gray-50);
+  border-radius: 4px;
+  border: 1px solid var(--gray-100);
+}
+
+.package-card__price {
+  padding-top: var(--space-md);
+  border-top: 1px dashed var(--gray-200);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.package-card__amount {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--green-700);
+}
+
+.package-card__unit {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+.modal__package-details {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal__package-details li {
+  font-size: 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.modal__package-details li:last-child {
+  border-bottom: none;
+}
+
+.modal__package-details strong {
+  display: inline-block;
+  width: 110px;
+  color: var(--gray-700);
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .menu-grid { grid-template-columns: repeat(2, 1fr); }

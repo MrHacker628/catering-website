@@ -19,12 +19,14 @@ const categoryImages = {
 
 function Menu() {
   const [menuItems, setMenuItems] = useState([]);
+  const [packages, setPackages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     fetchMenu();
+    fetchPackages();
   }, []);
 
   function fetchMenu() {
@@ -37,6 +39,16 @@ function Menu() {
       .catch(function (err) {
         console.log("Error fetching menu:", err);
         setLoading(false);
+      });
+  }
+
+  function fetchPackages() {
+    axios.get('http://localhost:5000/packages/all')
+      .then(function (res) {
+        setPackages(res.data);
+      })
+      .catch(function (err) {
+        console.log("Error fetching packages:", err);
       });
   }
 
@@ -90,6 +102,51 @@ function Menu() {
                 <div className="menu-loading__spinner"></div>
                 <p>Loading menu...</p>
               </div>
+            ) : selectedCategory === 'Custom Package' ? (
+              packages.length === 0 ? (
+                <div className="menu-empty">
+                  <span><Utensils size={48} /></span>
+                  <p>No packages found.</p>
+                </div>
+              ) : (
+                <div className="package-grid">
+                  {packages.map((pkg, i) => (
+                    <article
+                      key={pkg.id}
+                      className="package-card"
+                      style={{ animationDelay: `${i * 0.05}s` }}
+                      onClick={() => setSelectedItem({
+                        isPackage: true,
+                        category: 'Custom Package',
+                        item_name: pkg.package_name || 'Custom Package',
+                        price_per_plate: pkg.price_500 || pkg.price_600 || 0,
+                        is_available: pkg.is_available,
+                        description: pkg.main_course || 'No items listed.',
+                        ...pkg
+                      })}
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && setSelectedItem({ isPackage: true, category: 'Custom Package', item_name: pkg.package_name || 'Custom Package', price_per_plate: pkg.price_500 || pkg.price_600 || 0, is_available: pkg.is_available, description: pkg.main_course || 'No items listed.', ...pkg })}
+                      role="button"
+                    >
+                      <div className="package-card__header">
+                        <h3>{pkg.package_name || 'Custom Package'}</h3>
+                        <span className={`package-tier package-tier--${(pkg.package_type || 'standard').toLowerCase().replace(/\s+/g, '-')}`}>{pkg.package_type || 'Package'}</span>
+                      </div>
+                      <div className="package-card__body">
+                        <p className="package-card__desc">{(pkg.main_course || '').substring(0, 80)}...</p>
+                        <div className="package-card__meta">
+                          <span>{pkg.waiter_info || 'Waiters Info NA'}</span>
+                          <span>{pkg.counter_setup || 'Counter Info NA'}</span>
+                        </div>
+                        <div className="package-card__price">
+                          <span className="package-card__amount">₹{(pkg.price_500 || pkg.price_600 || 0).toLocaleString()}</span>
+                          <span className="package-card__unit">per plate</span>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )
             ) : filtered.length === 0 ? (
               <div className="menu-empty">
                 <span><Utensils size={48} /></span>
@@ -153,8 +210,21 @@ function Menu() {
 
                 {selectedItem.description && (
                   <div className="modal__section">
-                    <h4>Description</h4>
+                    <h4>{selectedItem.isPackage ? 'Menu Highlights' : 'Description'}</h4>
                     <p>{selectedItem.description}</p>
+                  </div>
+                )}
+
+                {selectedItem.isPackage && (
+                  <div className="modal__section">
+                    <h4>Package Details</h4>
+                    <ul className="modal__package-details">
+                      <li><strong>Tier:</strong> {selectedItem.package_type || 'N/A'}</li>
+                      <li><strong>Counter:</strong> {selectedItem.counter_setup || 'N/A'}</li>
+                      <li><strong>Staff:</strong> {selectedItem.waiter_info || 'N/A'}</li>
+                      {selectedItem.welcome_drink && <li><strong>Welcome Drink:</strong> {selectedItem.welcome_drink}</li>}
+                      {selectedItem.desserts && <li><strong>Desserts:</strong> {selectedItem.desserts}</li>}
+                    </ul>
                   </div>
                 )}
 

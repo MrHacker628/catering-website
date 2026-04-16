@@ -90,7 +90,7 @@ CREATE TABLE `menu_items` (
   `is_available` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -99,6 +99,7 @@ CREATE TABLE `menu_items` (
 
 LOCK TABLES `menu_items` WRITE;
 /*!40000 ALTER TABLE `menu_items` DISABLE KEYS */;
+INSERT INTO `menu_items` VALUES (1,'Veg Thali Special','Veg Thali','Dal, Rice, Roti, Sabji, Salad, Papad',250.00,1,'2026-03-01 09:12:47'),(2,'Non-Veg Thali Special','Non-Veg Thali','Chicken Curry, Rice, Roti, Salad, Papad',350.00,1,'2026-03-01 09:12:47'),(3,'Chicken Biryani','Biryani','Hyderabadi style chicken biryani with raita',300.00,1,'2026-03-01 09:12:47'),(4,'Veg Biryani','Biryani','Aromatic veg biryani with raita',200.00,1,'2026-03-01 09:12:47'),(5,'Paneer Tikka','Starters','Tandoori paneer tikka with mint chutney',150.00,1,'2026-03-01 09:12:47'),(6,'Chicken Tikka','Starters','Juicy chicken tikka with mint chutney',180.00,1,'2026-03-01 09:12:47'),(7,'Gulab Jamun','Desserts','2 pieces per plate with sugar syrup',80.00,1,'2026-03-01 09:12:47'),(8,'Ice Cream','Desserts','2 scoops vanilla or chocolate',60.00,1,'2026-03-01 09:12:47'),(9,'Cold Drinks','Beverages','Pepsi, Sprite or Maaza',40.00,1,'2026-03-01 09:12:47'),(10,'Fresh Juice','Beverages','Orange, Watermelon or Mango',60.00,1,'2026-03-01 09:12:47');
 /*!40000 ALTER TABLE `menu_items` ENABLE KEYS */;
 UNLOCK TABLES;
 

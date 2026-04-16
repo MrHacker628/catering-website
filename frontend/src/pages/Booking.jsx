@@ -27,7 +27,7 @@ const categoryImages = {
   'Custom Package': 'https://images.unsplash.com/photo-1555244162-803834f70033?w=200&h=150&fit=crop',
 };
 
-const menuCategories = ['All', 'Veg Thali', 'Non-Veg Thali', 'Biryani', 'Starters', 'Desserts', 'Beverages'];
+const menuCategories = ['All', 'Veg Thali', 'Non-Veg Thali', 'Biryani', 'Starters', 'Desserts', 'Beverages', 'Custom Package'];
 
 function Booking({ currentUser, onLoginClick }) {
   const navigate = useNavigate();
@@ -38,6 +38,7 @@ function Booking({ currentUser, onLoginClick }) {
   const [phoneDigits, setPhoneDigits] = useState('');
   const [event, setEvent] = useState({ event_type: '', event_date: '', event_location: '', num_of_guests: '' });
   const [menuItems, setMenuItems] = useState([]);
+  const [packages, setPackages] = useState([]);
   const [selectedItems, setSelectedItems] = useState({}); // { itemId: quantity }
   const [menuFilter, setMenuFilter] = useState('All');
   const [errors, setErrors] = useState({});
@@ -65,6 +66,10 @@ function Booking({ currentUser, onLoginClick }) {
     axios.get('http://localhost:5000/menu/all')
       .then(res => setMenuItems(res.data))
       .catch(err => console.log("Error fetching menu:", err));
+      
+    axios.get('http://localhost:5000/packages/all')
+      .then(res => setPackages(res.data))
+      .catch(err => console.log("Error fetching packages:", err));
   }, []);
 
   /* ── Handlers ── */
@@ -106,10 +111,20 @@ function Booking({ currentUser, onLoginClick }) {
     const items = [];
 
     Object.entries(selectedItems).forEach(([id, qty]) => {
-      const item = menuItems.find(m => m.id === parseInt(id));
-      if (item) {
-        perPlate += parseFloat(item.price_per_plate) * qty;
-        items.push({ ...item, qty });
+      if (String(id).startsWith('pkg_')) {
+        const pkgId = parseInt(id.replace('pkg_', ''));
+        const pkg = packages.find(p => p.id === pkgId);
+        if (pkg) {
+          const price = parseFloat(pkg.price_500 || pkg.price_600 || 0);
+          perPlate += price * qty;
+          items.push({ id, item_name: pkg.package_name || 'Custom Package', price_per_plate: price, qty });
+        }
+      } else {
+        const item = menuItems.find(m => m.id === parseInt(id));
+        if (item) {
+          perPlate += parseFloat(item.price_per_plate) * qty;
+          items.push({ ...item, qty });
+        }
       }
     });
 
@@ -355,37 +370,83 @@ function Booking({ currentUser, onLoginClick }) {
                     ))}
                   </div>
 
-                  <div className="booking-menu-grid">
-                    {filteredMenu.map(item => {
-                      const qty = selectedItems[item.id];
-                      const isSelected = !!qty;
-                      return (
-                        <div key={item.id} className={`bm-card ${isSelected ? 'bm-card--selected' : ''}`}>
-                          <div className="bm-card__img">
-                            <img src={categoryImages[item.category] || categoryImages['Custom Package']} alt={item.item_name} loading="lazy" />
-                          </div>
-                          <div className="bm-card__body">
-                            <span className="bm-card__cat">{item.category}</span>
-                            <h4>{item.item_name}</h4>
-                            <span className="bm-card__price">₹{item.price_per_plate}/plate</span>
-
-                            {!isSelected ? (
-                              <button className="btn btn--sm btn--primary bm-card__add" onClick={() => toggleItem(item.id)}>
-                                + Add
-                              </button>
-                            ) : (
-                              <div className="bm-card__qty">
-                                <button onClick={() => updateQty(item.id, qty - 1)} aria-label="Decrease quantity">−</button>
-                                <span>{qty}</span>
-                                <button onClick={() => updateQty(item.id, qty + 1)} aria-label="Increase quantity">+</button>
-                                <button className="bm-card__remove" onClick={() => toggleItem(item.id)} aria-label="Remove item">✕</button>
+                  {menuFilter === 'Custom Package' ? (
+                    <div className="booking-package-grid">
+                      {packages.map(pkg => {
+                        const id = `pkg_${pkg.id}`;
+                        const qty = selectedItems[id];
+                        const isSelected = !!qty;
+                        const price = pkg.price_500 || pkg.price_600;
+                        return (
+                          <div key={id} className={`bm-pkg-card ${isSelected ? 'bm-pkg-card--selected' : ''}`}>
+                            <div className="bm-pkg-card__header">
+                              <div>
+                                <h4>{pkg.package_name || 'Custom Package'}</h4>
+                                <span className="bm-pkg-card__tier">{pkg.package_type || 'Package'}</span>
                               </div>
-                            )}
+                              <div className="bm-pkg-card__price">
+                                <strong>₹{(price || 0).toLocaleString()}</strong>/plate
+                              </div>
+                            </div>
+                            <div className="bm-pkg-card__body">
+                              <p>{pkg.main_course || 'No items listed'}</p>
+                              <div className="bm-pkg-card__meta">
+                                <span>{pkg.waiter_info || 'Waiters Info NA'}</span>
+                                <span>{pkg.counter_setup || 'Counter Info NA'}</span>
+                                {pkg.welcome_drink && <span>+ {pkg.welcome_drink}</span>}
+                              </div>
+                            </div>
+                            <div className="bm-pkg-card__footer">
+                              {!isSelected ? (
+                                <button className="btn btn--sm btn--primary" style={{ width: '100%' }} onClick={() => toggleItem(id)}>
+                                  Select Package
+                                </button>
+                              ) : (
+                                <div className="bm-card__qty" style={{ width: '100%', justifyContent: 'center' }}>
+                                  <button onClick={() => updateQty(id, qty - 1)} aria-label="Decrease quantity">−</button>
+                                  <span>{qty}</span>
+                                  <button onClick={() => updateQty(id, qty + 1)} aria-label="Increase quantity">+</button>
+                                  <button className="bm-card__remove" onClick={() => toggleItem(id)} aria-label="Remove item">✕</button>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="booking-menu-grid">
+                      {filteredMenu.map(item => {
+                        const qty = selectedItems[item.id];
+                        const isSelected = !!qty;
+                        return (
+                          <div key={item.id} className={`bm-card ${isSelected ? 'bm-card--selected' : ''}`}>
+                            <div className="bm-card__img">
+                              <img src={categoryImages[item.category] || categoryImages['Custom Package']} alt={item.item_name} loading="lazy" />
+                            </div>
+                            <div className="bm-card__body">
+                              <span className="bm-card__cat">{item.category}</span>
+                              <h4>{item.item_name}</h4>
+                              <span className="bm-card__price">₹{item.price_per_plate}/plate</span>
+
+                              {!isSelected ? (
+                                <button className="btn btn--sm btn--primary bm-card__add" onClick={() => toggleItem(item.id)}>
+                                  + Add
+                                </button>
+                              ) : (
+                                <div className="bm-card__qty">
+                                  <button onClick={() => updateQty(item.id, qty - 1)} aria-label="Decrease quantity">−</button>
+                                  <span>{qty}</span>
+                                  <button onClick={() => updateQty(item.id, qty + 1)} aria-label="Increase quantity">+</button>
+                                  <button className="bm-card__remove" onClick={() => toggleItem(item.id)} aria-label="Remove item">✕</button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   {submitMsg && <p className="field-error" style={{ textAlign: 'center', marginTop: '16px' }}>{submitMsg}</p>}
 
