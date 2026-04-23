@@ -1,0 +1,123 @@
+/* LocationPicker.css */
+
+.location-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── INPUT ROW ── */
+.location-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.location-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.location-input {
+  width: 100%;
+  padding: 12px 40px 12px 38px;
+  border: 1.5px solid #d0b0f0;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  background: white;
+}
+
+.location-input:focus {
+  border-color: #4a0080;
+  box-shadow: 0 0 0 3px rgba(74, 0, 128, 0.08);
+}
+
+.location-clear {
+  position: absolute;
+  right: 10px;
+  background: #f0e0ff;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #4a0080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-clear:hover { background: #e0c0ff; }
+
+/* ── SELECTED BADGE ── */
+.location-selected {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* ── MAP BOX ── */
+.location-map {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  border: 1.5px solid #e0c0ff;
+  overflow: hidden;
+  background: #f5f0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-loading {
+  font-size: 14px;
+  color: #999;
+}
+
+/* Google autocomplete dropdown style override */
+.pac-container {
+  border-radius: 10px !important;
+  border: 1px solid #d0b0f0 !important;
+  box-shadow: 0 4px 15px rgba(74,0,128,0.1) !important;
+  margin-top: 4px;
+  font-family: inherit !important;
+}
+
+.pac-item {
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+  cursor: pointer;
+}
+
+.pac-item:hover { background: #f9f0ff !important; }
+
+.pac-item-query { color: #4a0080 !important; font-weight: 500; }
+
+
+/* Force map to always show — even before Google loads */
+.location-map {
+  width: 100% !important;
+  height: 250px !important;
+  border-radius: 12px !important;
+  border: 2px solid #d0b0f0 !important;
+  overflow: hidden !important;
+  background: #f5f0ff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 10px !important;
+}
+
+.map-loading {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+}

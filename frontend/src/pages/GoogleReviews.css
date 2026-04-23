@@ -1,0 +1,471 @@
+/* ═══════════════════════════════════════════════════════════
+   GoogleReviews.css  –  Mannat Caterers  |  Premium Redesign
+   Palette : Forest Emerald · Champagne Gold · Cream Off-White
+   Fonts   : Playfair Display (headings) · Plus Jakarta Sans (body)
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* ── CSS Custom Properties ───────────────────────────────── */
+:root {
+  --green-deep:    #0f3d26;
+  --green-forest:  #1a5c38;
+  --green-mid:     #226b44;
+  --green-light:   #e8f4ec;
+  --green-pale:    #f2faf5;
+
+  --gold:          #c9a84c;
+  --gold-light:    #f0d98a;
+  --gold-pale:     #fdf8ec;
+
+  --cream:         #fdfcf8;
+  --cream-card:    #fffef9;
+  --border-card:   #e8e0cc;
+
+  --text-dark:     #1a1a1a;
+  --text-mid:      #444;
+  --text-muted:    #888;
+  --text-light:    #bbb;
+
+  --shadow-card:   0 4px 24px rgba(15, 61, 38, 0.10);
+  --shadow-lift:   0 12px 40px rgba(15, 61, 38, 0.16);
+  --radius-card:   18px;
+  --radius-btn:    100px;
+}
+
+/* ── Section Wrapper ─────────────────────────────────────── */
+.gr-wrap {
+  position: relative;
+  padding: 80px 24px 72px;
+  background: var(--green-pale);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 10% 20%, rgba(26,92,56,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 90% 80%, rgba(201,168,76,0.08) 0%, transparent 70%);
+  text-align: center;
+  overflow: hidden;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── Decorative Background Leaves ───────────────────────── */
+.gr-bg-leaf {
+  position: absolute;
+  border-radius: 50% 0 50% 0;
+  opacity: 0.06;
+  pointer-events: none;
+}
+.gr-bg-leaf--1 {
+  width: 360px; height: 360px;
+  background: var(--green-forest);
+  top: -80px; left: -100px;
+  transform: rotate(30deg);
+}
+.gr-bg-leaf--2 {
+  width: 280px; height: 280px;
+  background: var(--gold);
+  bottom: -60px; right: -60px;
+  transform: rotate(-20deg);
+}
+
+.gr-bg-dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(15,61,38,0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ── Section Header ──────────────────────────────────────── */
+.gr-header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 40px;
+}
+
+.gr-eyebrow {
+  display: inline-block;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 100px;
+  padding: 5px 16px;
+  margin-bottom: 16px;
+}
+
+.gr-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  color: var(--green-deep);
+  line-height: 1.25;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.gr-title em {
+  font-style: italic;
+  color: var(--green-forest);
+  position: relative;
+}
+
+.gr-title em::after {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 2px;
+  margin-top: 2px;
+}
+
+.gr-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Overall Rating Panel ────────────────────────────────── */
+.gr-overall {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  background: var(--cream-card);
+  border: 1px solid var(--border-card);
+  border-radius: 20px;
+  padding: 24px 36px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 48px;
+  text-align: left;
+}
+
+.gr-overall-left {
+  text-align: center;
+}
+
+.gr-big {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 64px;
+  font-weight: 700;
+  color: var(--green-deep);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.gr-out-of {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.gr-divider {
+  width: 1px;
+  height: 64px;
+  background: linear-gradient(to bottom, transparent, var(--border-card), transparent);
+}
+
+.gr-overall-right {
+  text-align: left;
+}
+
+.gr-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 8px 0 12px;
+}
+
+.gr-count strong {
+  color: var(--green-forest);
+  font-weight: 700;
+}
+
+.gr-overall-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.gr-maplink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: var(--radius-btn);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  text-decoration: none;
+}
+.gr-maplink:hover {
+  border-color: var(--green-forest);
+  color: var(--green-forest);
+  background: var(--green-light);
+}
+
+.gr-write-review {
+  display: inline-block;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--green-deep);
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: var(--radius-btn);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 2px 10px rgba(201,168,76,0.35);
+}
+.gr-write-review:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* ── Google Logo (SVG) ───────────────────────────────────── */
+.gr-google-logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Stars ───────────────────────────────────────────────── */
+.gr-stars {
+  display: flex;
+  gap: 3px;
+}
+
+.star {
+  font-size: 20px;
+  color: var(--text-light);
+  line-height: 1;
+  transition: color 0.15s;
+}
+.star.on {
+  color: var(--gold);
+  text-shadow: 0 0 6px rgba(201,168,76,0.5);
+}
+
+/* ── Carousel Wrapper ────────────────────────────────────── */
+.gr-carousel-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.gr-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 12px 6px 28px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.gr-carousel::-webkit-scrollbar { display: none; }
+
+/* ── Review Card ─────────────────────────────────────────── */
+.gr-card {
+  min-width: 300px;
+  max-width: 300px;
+  background: var(--cream-card);
+  border-radius: var(--radius-card);
+  padding: 22px 20px 18px;
+  text-align: left;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-card);
+  flex-shrink: 0;
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  animation: cardFadeUp 0.5s ease both;
+  animation-delay: var(--delay, 0s);
+}
+.gr-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lift);
+}
+
+@keyframes cardFadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Card Top Row */
+.gr-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.gr-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gold-light);
+  flex-shrink: 0;
+}
+
+.gr-reviewer-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gr-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gr-time {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.gr-google-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* Review Text (blockquote) */
+.gr-text {
+  margin: 10px 0 14px;
+  padding: 0;
+  border: none;
+}
+
+.gr-text p {
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.65;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
+
+/* Verified Badge */
+.gr-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green-forest);
+  background: var(--green-light);
+  border: 1px solid rgba(26,92,56,0.15);
+  border-radius: 100px;
+  padding: 3px 10px;
+}
+
+.gr-verified-dot {
+  font-size: 9px;
+  background: var(--green-forest);
+  color: #fff;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+/* ── Scroll Buttons ──────────────────────────────────────── */
+.gr-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-60%);
+  background: var(--cream-card);
+  border: 1px solid var(--border-card);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 18px;
+  color: var(--green-forest);
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(15,61,38,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.gr-btn:hover {
+  background: var(--green-light);
+  box-shadow: 0 4px 20px rgba(15,61,38,0.18);
+  transform: translateY(-60%) scale(1.07);
+}
+.gr-btn.left  { left:  -22px; }
+.gr-btn.right { right: -22px; }
+
+/* ── Bottom CTA ──────────────────────────────────────────── */
+.gr-bottom-cta {
+  position: relative;
+  z-index: 1;
+  margin-top: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.gr-cta-text {
+  font-size: 15px;
+  color: var(--text-mid);
+}
+.gr-cta-text strong { color: var(--green-deep); }
+
+.gr-cta-btn {
+  display: inline-block;
+  padding: 14px 32px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green-deep);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  border-radius: var(--radius-btn);
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s;
+}
+.gr-cta-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 32px rgba(201,168,76,0.5);
+}
+.gr-cta-btn:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 680px) {
+  .gr-overall {
+    flex-direction: column;
+    gap: 18px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .gr-divider { width: 60px; height: 1px; }
+  .gr-overall-right { text-align: center; }
+  .gr-overall-actions { justify-content: center; }
+  .gr-btn.left  { left:  -14px; }
+  .gr-btn.right { right: -14px; }
+}

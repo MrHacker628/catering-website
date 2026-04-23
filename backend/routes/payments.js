@@ -31,18 +31,13 @@ router.post('/create-order', async function(req, res) {
     // Razorpay needs amount in PAISE (not rupees)
     // 1 Rupee = 100 Paise
     // So multiply amount by 100
-    const amountInPaise = amount * 100;
-
-    // Options for Razorpay order
     const options = {
-        amount: amountInPaise,
+        amount:   amount,        // ← was: amount * 100 (WRONG)
         currency: 'INR',
-        receipt: `order_${order_id}`, // unique receipt id
-        notes: {
-            order_id: order_id,
-            customer_id: customer_id
-        }
+        receipt:  `order_${Date.now()}`,
+        notes: { order_id, customer_id }
     };
+    
 
     try {
         // Create order in Razorpay
@@ -63,8 +58,9 @@ router.post('/create-order', async function(req, res) {
                 // Send Razorpay order details back to React
                 // React needs these to open the payment popup
                 res.status(200).json({
+                     orderId:  razorpayOrder.id,
                     message: "✅ Payment order created!",
-                    razorpay_order_id: razorpayOrder.id,
+                    // razorpay_order_id: razorpayOrder.id,
                     amount: amount,
                     currency: 'INR'
                 });
