@@ -11,8 +11,10 @@ import Booking from './pages/Booking';
 import Payment from './pages/Payment';
 import Admin from './pages/Admin';
 
+
 import Navbar from './components/Navbar';
 
+import MenuSelection from './pages/MenuSelection';
 // Import main CSS
 import './App.css';
 
@@ -84,6 +86,8 @@ const [showAuthModal, setShowAuthModal] = useState(false);
 
         {/* "/admin" loads Admin dashboard — protected later */}
         <Route path="/admin" element={<Admin />} />
+
+        <Route path="/menu-selection" element={<MenuSelection />} />
       </Routes>
     </BrowserRouter>
   );

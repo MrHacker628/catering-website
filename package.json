@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@sanity/client": "^7.22.1",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.3"
   }

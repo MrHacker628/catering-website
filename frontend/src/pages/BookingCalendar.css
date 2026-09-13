@@ -1,0 +1,368 @@
+/* BookingCalendar.css — Mannat Caterers Premium Calendar */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ── CSS VARIABLES ── */
+:root {
+  --forest:        #1a3c2a;
+  --forest-mid:    #235236;
+  --forest-light:  #2d6a47;
+  --forest-pale:   #e8f0eb;
+  --forest-mist:   #f2f6f3;
+
+  --gold:          #c9a84c;
+  --gold-light:    #e2c36e;
+  --gold-pale:     #fdf6e3;
+  --gold-deep:     #a87c28;
+
+  --cream:         #faf7f2;
+  --cream-dark:    #f0ebe0;
+  --cream-border:  #e5ddd0;
+
+  --text-dark:     #1c2b22;
+  --text-mid:      #3d5045;
+  --text-muted:    #7a9080;
+
+  --booked-bg:     #f1f1f1;
+  --booked-txt:    #b0b8b4;
+
+  --today-ring:    var(--forest-light);
+
+  --shadow-card:   0 8px 40px rgba(26, 60, 42, 0.1), 0 2px 8px rgba(26, 60, 42, 0.06);
+  --transition:    all 0.3s ease-in-out;
+  --radius-card:   18px;
+}
+
+/* ── PAGE WRAPPER ── */
+.calendar-wrapper {
+  padding: 72px 20px 80px;
+  background: var(--cream);
+  text-align: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── SEO HEADING BLOCK ── */
+.calendar-header-top {
+  margin-bottom: 36px;
+}
+
+.calendar-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.calendar-header-top h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 700;
+  color: var(--forest);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.calendar-header-top h2 em {
+  font-style: italic;
+  color: var(--forest-light);
+}
+
+.calendar-header-top p {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 400;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── CALENDAR CONTAINER ── */
+.calendar-container {
+  background: white;
+  border-radius: var(--radius-card);
+  padding: 32px 28px 28px;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--cream-border);
+  position: relative;
+}
+
+/* Subtle top accent bar */
+.calendar-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--forest), var(--forest-light), var(--gold));
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+/* ── MONTH NAVIGATION ── */
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.calendar-nav h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--forest);
+  letter-spacing: -0.01em;
+}
+
+.cal-nav-btn {
+  background: var(--forest-mist);
+  border: 1.5px solid var(--forest-pale);
+  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+  color: var(--forest);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  line-height: 1;
+  font-weight: 600;
+}
+
+.cal-nav-btn:hover {
+  background: var(--forest);
+  color: white;
+  border-color: var(--forest);
+  transform: scale(1.05);
+}
+
+.cal-nav-btn:active { transform: scale(0.97); }
+
+/* ── CALENDAR GRID ── */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 24px;
+}
+
+/* ── DAY NAME HEADERS ── */
+.cal-day-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 6px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── CALENDAR CELLS ── */
+.cal-cell {
+  border-radius: 10px;
+  padding: 6px 2px;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  transition: var(--transition);
+  cursor: default;
+}
+
+.cal-cell .cal-day-num {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  transition: var(--transition);
+}
+
+/* Empty cells */
+.cal-cell.empty {
+  background: transparent;
+  pointer-events: none;
+}
+
+/* ── AVAILABLE ── */
+.cal-cell.available {
+  color: var(--text-dark);
+  background: transparent;
+}
+
+.cal-cell.available:hover {
+  background: var(--forest-mist);
+  color: var(--forest);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(26, 60, 42, 0.1);
+}
+
+/* ── BOOKED ── */
+.cal-cell.booked {
+  background: var(--booked-bg);
+  color: var(--booked-txt);
+  cursor: not-allowed;
+  position: relative;
+}
+
+/* Strikethrough effect on booked date number */
+.cal-cell.booked .cal-day-num {
+  text-decoration: line-through;
+  text-decoration-color: #ccc;
+  opacity: 0.7;
+}
+
+/* ── PAST ── */
+.cal-cell.past {
+  background: transparent;
+  color: #d0d8d4;
+  pointer-events: none;
+}
+
+.cal-cell.past .cal-day-num {
+  font-weight: 400;
+}
+
+/* ── TODAY ── */
+.cal-cell.today {
+  outline: 2px solid var(--today-ring);
+  outline-offset: -2px;
+}
+
+.cal-cell.today:not(.past):not(.booked) .cal-day-num {
+  color: var(--forest);
+  font-weight: 700;
+}
+
+/* ── SELECTED (Gold) ── */
+.cal-cell.selected {
+  background: linear-gradient(135deg, var(--gold-deep), var(--gold)) !important;
+  color: white !important;
+  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.45);
+  transform: translateY(-2px) scale(1.05);
+  outline: none;
+  z-index: 1;
+}
+
+.cal-cell.selected .cal-day-num {
+  color: white !important;
+  font-weight: 700;
+  text-decoration: none !important;
+  opacity: 1 !important;
+}
+
+.cal-cell.selected .booked-label { display: none; }
+
+/* ── BOOKED LABEL ── */
+.booked-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--booked-txt);
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+/* ── DIVIDER ── */
+.cal-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cream-border), transparent);
+  margin-bottom: 18px;
+}
+
+/* ── LEGEND ── */
+.cal-legend {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.available-dot  { background: var(--forest-mist); border: 1.5px solid var(--forest-pale); }
+.booked-dot     { background: var(--booked-bg); border: 1px solid #d8dedd; }
+.today-dot      { background: white; border: 2px solid var(--today-ring); }
+.past-dot       { background: #f0f0f0; }
+.selected-dot   { background: linear-gradient(135deg, var(--gold-deep), var(--gold)); }
+
+/* ── SELECTED DATE DISPLAY ── */
+.selected-date-display {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: var(--gold-pale);
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── LOADING STATE ── */
+.cal-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.cal-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--forest-pale);
+  border-top-color: var(--forest);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .calendar-container {
+    padding: 24px 16px 20px;
+  }
+
+  .cal-cell {
+    min-height: 42px;
+    border-radius: 8px;
+  }
+
+  .cal-cell .cal-day-num { font-size: 13px; }
+
+  .calendar-nav h3 { font-size: 18px; }
+}
