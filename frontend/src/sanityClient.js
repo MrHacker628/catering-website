@@ -1,13 +1,13 @@
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 
+// Read-only, public client for the storefront — never add an API token here.
+// A token embedded in frontend code ships to every visitor's browser.
 export const client = createClient({
   projectId: '4wdchewz',
   dataset: 'production',
-  useCdn: false,
+  useCdn: true, // fine for published, public content — faster and cheaper than hitting the API directly
   apiVersion: '2024-01-01',
-//   token: 'skev9qRPLxHdnh3eThEOpKu4oSr2Ditjj9RB4b0jt8D9hfSurPagqgKn8X9F8rn1TQKMn9qvlTT7mYEh6fdOoRhK0OcN1Pl3CIvmdRp2kljNA5HwL9pjq9OkvAaufHeTUdwh3M5S4dJUDzIpneuKxGBY7mhiqdToG2GPUNir3h0aCLgYHTLP
-// '
 })
 
 const builder = imageUrlBuilder(client)

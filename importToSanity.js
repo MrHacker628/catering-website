@@ -1,12 +1,44 @@
 const { createClient } = require('@sanity/client')
 
+// The write token must never be committed. Set it in a local, untracked .env
+// (see .env.example) and run this script with:
+//   node --env-file=.env importToSanity.js
+const token = process.env.SANITY_WRITE_TOKEN
+if (!token) {
+  console.error(
+    '❌ Missing SANITY_WRITE_TOKEN. Create a .env file (see .env.example) with a token ' +
+    'that has "Editor" or "Write" access, then run: node --env-file=.env importToSanity.js'
+  )
+  process.exit(1)
+}
+
 const client = createClient({
-  projectId: '4wdchewz',  // ← paste your project ID here
+  projectId: '4wdchewz',
   dataset: 'production',
   useCdn: false,
   apiVersion: '2024-01-01',
-  token: 'skev9qRPLxHdnh3eThEOpKu4oSr2Ditjj9RB4b0jt8D9hfSurPagqgKn8X9F8rn1TQKMn9qvlTT7mYEh6fdOoRhK0OcN1Pl3CIvmdRp2kljNA5HwL9pjq9OkvAaufHeTUdwh3M5S4dJUDzIpneuKxGBY7mhiqdToG2GPUNir3h0aCLgYHTLP',  // ← we'll get this in Step 3
+  token,
 })
+
+// Default ₹ price per plate by category — the source data below didn't carry
+// real prices, so these are placeholders. Adjust per-item prices in Sanity
+// Studio once real numbers are available.
+const DEFAULT_PRICE_BY_CATEGORY = {
+  'Rice': 180,
+  'Veg Rice': 150,
+  'Non-Veg Gravy': 220,
+  'Veg Gravy': 160,
+  'Dry Items': 200,
+  'Veg Starters': 140,
+  'Breads': 40,
+  'Salads': 90,
+  'Welcome Drink': 60,
+  'Chaat': 100,
+  'Live Counters': 250,
+  'Paan': 50,
+  'Dessert': 120,
+}
+const FALLBACK_PRICE = 150
 
 // ── All 174 menu items from your SQL ──
 const menuItems = [
@@ -200,6 +232,7 @@ async function importMenu() {
         description: item.description,
         imageUrl: item.image_url,
         isVeg: item.is_veg,
+        price: item.price ?? DEFAULT_PRICE_BY_CATEGORY[item.category] ?? FALLBACK_PRICE,
       })
       console.log(`✅ (${i + 1}/${menuItems.length}) Imported: ${item.name}`)
     } catch (err) {

@@ -449,24 +449,28 @@ function Menu() {
   function fetchMenuItems() {
       setLoading(true);
   const query = `*[_type == "menuItem"]{
+    _id,
     name,
     category,
     packageType,
     description,
     imageUrl,
-    isVeg
+    isVeg,
+    price
   }`
-  
+
   client.fetch(query).then(function(data) {
     // map Sanity fields to match your existing JSX
     const mapped = data.map(function(item) {
       return {
+        id: item._id,
         item_name: item.name,
         category: item.category,
         package_type: item.packageType,
         description: item.description,
         image_url: item.imageUrl,
         is_veg: item.isVeg,
+        price: item.price,
       }
     })
     setMenuItems(mapped)
@@ -877,6 +881,11 @@ function Menu() {
 
                     {/* Item name */}
                     <h3 className="mn-menu-card__name">{item.item_name}</h3>
+
+                    {/* Price per plate */}
+                    {item.price != null && (
+                      <div className="mn-menu-card__price">₹{item.price} / plate</div>
+                    )}
 
                     {/* Description — conditional UNCHANGED */}
                     {item.description && (

@@ -848,6 +848,14 @@
   line-height: 1.35;
 }
 
+/* Price per plate */
+.mn-menu-card__price {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mg-gold);
+  margin-bottom: 6px;
+}
+
 /* Description */
 .mn-menu-card__desc {
   font-size: 12px;
