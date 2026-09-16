@@ -15,7 +15,7 @@
 
 //     // ── FETCH BOOKED DATES ──
 //     useEffect(function() {
-//         axios.get('http://localhost:5000/orders/booked-dates')
+//         axios.get(`${API_BASE_URL}/orders/booked-dates`)
 //             .then(function(res) {
 //                 console.log("📅 Booked dates from API:", res.data); 
 //                 setBookedDates(res.data.bookedDates);
@@ -176,6 +176,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../apiConfig';
 import './BookingCalendar.css';
 
 /* ── JSON-LD SEO SCHEMA ── */
@@ -218,7 +219,7 @@ function BookingCalendar() {
 
   // ── FETCH BOOKED DATES (unchanged) ──
   useEffect(function() {
-    axios.get('http://localhost:5000/orders/booked-dates')
+    axios.get(`${API_BASE_URL}/orders/booked-dates`)
       .then(function(res) {
         console.log("📅 Booked dates from API:", res.data);
         setBookedDates(res.data.bookedDates);

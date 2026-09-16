@@ -77,7 +77,7 @@
 //   // ── FETCH ALL PACKAGES ──
 //   function fetchPackages() {
 //     setPackagesLoading(true);
-//     axios.get('http://localhost:5000/packages/all')
+//     axios.get(`${API_BASE_URL}/packages/all`)
 //       .then(function (response) {
 //         setPackages(response.data);
 //         setPackagesLoading(false);
@@ -384,6 +384,7 @@ import React, { useState, useEffect } from 'react';
 import { client } from '../sanityClient'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../apiConfig';
 import './Menu.css';
 
 // Fallback image if image_url from DB is null or broken
@@ -484,7 +485,7 @@ function Menu() {
   // ── FETCH ALL PACKAGES — UNCHANGED ──
   function fetchPackages() {
     setPackagesLoading(true);
-    axios.get('http://localhost:5000/packages/all')
+    axios.get(`${API_BASE_URL}/packages/all`)
       .then(function (response) {
         setPackages(response.data);
         setPackagesLoading(false);

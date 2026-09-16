@@ -29,7 +29,7 @@
 
 //   // ── FETCH MENU ──
 //   useEffect(function() {
-//     axios.get('http://localhost:5000/menu/all')
+//     axios.get(`${API_BASE_URL}/menu/all`)
 //       .then(function(res) {
 //         setMenuItems(res.data);
 //         setLoading(false);
@@ -351,6 +351,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../apiConfig';
 import './MenuSelection.css';
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1555244162-803834f70033?w=400';
@@ -404,7 +405,7 @@ function MenuSelection() {
 
   // ── FETCH MENU ── (unchanged)
   useEffect(function() {
-    axios.get('http://localhost:5000/menu/all')
+    axios.get(`${API_BASE_URL}/menu/all`)
       .then(function(res) {
         setMenuItems(res.data);
         setLoading(false);

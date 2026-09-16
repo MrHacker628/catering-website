@@ -79,10 +79,10 @@
 
 //     // Send 4 requests at the same time
 //     Promise.all([
-//       axios.get('http://localhost:5000/orders/all', config),
-//       axios.get('http://localhost:5000/customers/all', config),
-//       axios.get('http://localhost:5000/inventory/all', config),
-//       axios.get('http://localhost:5000/payments/all', config)
+//       axios.get(`${API_BASE_URL}/orders/all`, config),
+//       axios.get(`${API_BASE_URL}/customers/all`, config),
+//       axios.get(`${API_BASE_URL}/inventory/all`, config),
+//       axios.get(`${API_BASE_URL}/payments/all`, config)
 //     ])
 //       .then(function ([ordersRes, customersRes, inventoryRes, paymentsRes]) {
 //         // Save each response into its useState variable
@@ -105,7 +105,7 @@
 //   function updateOrderStatus(orderId, newStatus) {
 
 //     const token = localStorage.getItem('token');
-//     axios.put(`http://localhost:5000/orders/status/${orderId}`,
+//     axios.put(`${API_BASE_URL}/orders/status/${orderId}`,
 //         { status: newStatus },
 //         { headers: { Authorization: `Bearer ${token}` }}
 //     )
@@ -113,7 +113,7 @@
 //         fetchAllData();
 //     });
 
-//     axios.put(`http://localhost:5000/orders/status/${orderId}`, {
+//     axios.put(`${API_BASE_URL}/orders/status/${orderId}`, {
 //       order_status: newStatus
 //     })
 //       .then(function () {
@@ -140,7 +140,7 @@
 //         return;
 //     }
 //     const token = localStorage.getItem('token');
-//     axios.post('http://localhost:5000/inventory/add', newItem,
+//     axios.post(`${API_BASE_URL}/inventory/add`, newItem,
 //         { headers: { Authorization: `Bearer ${token}` }}
 //     )
 //     .then(function() {
@@ -157,7 +157,7 @@
 //   function deleteInventoryItem(itemId) {
 //      if (window.confirm('Are you sure you want to delete?')) {
 //         const token = localStorage.getItem('token');
-//         axios.delete(`http://localhost:5000/inventory/delete/${itemId}`,
+//         axios.delete(`${API_BASE_URL}/inventory/delete/${itemId}`,
 //             { headers: { Authorization: `Bearer ${token}` }}
 //         )
 //         .then(function() {
@@ -525,6 +525,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../apiConfig';
 import './Admin.css';
 
 
@@ -551,7 +552,7 @@ function Admin() {
   // hardcoded password client-side — that never called the API, so no real
   // token was ever obtained, and every admin request below failed with 401.
   function handlePasswordSubmit() {
-    axios.post('http://localhost:5000/auth/admin-login', { password: passwordInput })
+    axios.post(`${API_BASE_URL}/auth/admin-login`, { password: passwordInput })
       .then(function (res) {
         localStorage.setItem('admin_token', res.data.token);
         setIsAuthenticated(true);
@@ -570,10 +571,10 @@ function Admin() {
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
     Promise.all([
-      axios.get('http://localhost:5000/orders/all', config),
-      axios.get('http://localhost:5000/customers/all', config),
-      axios.get('http://localhost:5000/inventory/all', config),
-      axios.get('http://localhost:5000/payments/all', config)
+      axios.get(`${API_BASE_URL}/orders/all`, config),
+      axios.get(`${API_BASE_URL}/customers/all`, config),
+      axios.get(`${API_BASE_URL}/inventory/all`, config),
+      axios.get(`${API_BASE_URL}/payments/all`, config)
     ])
       .then(function ([ordersRes, customersRes, inventoryRes, paymentsRes]) {
         console.log("✅ Orders:", ordersRes.data);
@@ -603,7 +604,7 @@ function Admin() {
   // persisted, which is why cancelling never reflected on the calendar.
   function updateOrderStatus(orderId, newStatus) {
     const token = localStorage.getItem('admin_token');
-    axios.put(`http://localhost:5000/orders/status/${orderId}`,
+    axios.put(`${API_BASE_URL}/orders/status/${orderId}`,
       { order_status: newStatus },
       { headers: { Authorization: `Bearer ${token}` } }
     ).then(function () {
@@ -620,7 +621,7 @@ function Admin() {
       return;
     }
     const token = localStorage.getItem('admin_token');
-    axios.delete(`http://localhost:5000/orders/${orderId}`,
+    axios.delete(`${API_BASE_URL}/orders/${orderId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     ).then(function () {
       fetchAllData();
@@ -645,7 +646,7 @@ function Admin() {
       return;
     }
     const token = localStorage.getItem('admin_token');
-    axios.post('http://localhost:5000/inventory/add', newItem,
+    axios.post(`${API_BASE_URL}/inventory/add`, newItem,
       { headers: { Authorization: `Bearer ${token}` }}
     ).then(function() {
       alert('✅ Item added!');
@@ -657,7 +658,7 @@ function Admin() {
   function deleteInventoryItem(itemId) {
     if (window.confirm('Are you sure you want to delete?')) {
       const token = localStorage.getItem('admin_token');
-      axios.delete(`http://localhost:5000/inventory/delete/${itemId}`,
+      axios.delete(`${API_BASE_URL}/inventory/delete/${itemId}`,
         { headers: { Authorization: `Bearer ${token}` }}
       ).then(function() { fetchAllData(); });
     }

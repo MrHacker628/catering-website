@@ -51,7 +51,7 @@
 
 //   // ── FETCH PACKAGES WHEN PAGE LOADS ──
 //   useEffect(() => {
-//     axios.get('http://localhost:5000/packages/all')
+//     axios.get(`${API_BASE_URL}/packages/all`)
 //       .then(function (response) {
 //         setPackages(response.data);
 //       })
@@ -672,6 +672,7 @@ import { useNavigate } from 'react-router-dom';
 import './Booking.css';
 import LocationPicker from './LocationPicker';
 import { useLocation } from 'react-router-dom';
+import { API_BASE_URL } from '../apiConfig';
 
 function Booking({ currentUser }) {
 
@@ -710,7 +711,7 @@ function Booking({ currentUser }) {
 
   // ── FETCH PACKAGES — UNCHANGED ──
   useEffect(() => {
-    axios.get('http://localhost:5000/packages/all')
+    axios.get(`${API_BASE_URL}/packages/all`)
       .then(function (response) {
         setPackages(response.data);
       })
@@ -824,14 +825,14 @@ function Booking({ currentUser }) {
     setMessage('');
     try {
       const custRes = await axios.post(
-        'http://localhost:5000/customers/add',
+        `${API_BASE_URL}/customers/add`,
         customerData,
         getAuthHeaders()
       );
       const customerId = custRes.data.customerId;
 
       const orderRes = await axios.post(
-        'http://localhost:5000/orders/add',
+        `${API_BASE_URL}/orders/add`,
         {
           customer_id: customerId,
           event_type: eventData.event_type,

@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../apiConfig';
 import './Payment.css';
 
 // Auth header helper
@@ -47,7 +48,7 @@ function Payment() {
 
     try {
       await axios.post(
-        'http://localhost:5000/invoices/send',
+        `${API_BASE_URL}/invoices/send`,
         {
           orderId,
           customerId,
@@ -87,7 +88,7 @@ function Payment() {
     try {
       // Step 1 — Create Razorpay order on backend
       const orderRes = await axios.post(
-        'http://localhost:5000/payments/create-order',
+        `${API_BASE_URL}/payments/create-order`,
         {
           amount: amount * 100,  // paise
           order_id: orderId,       // ← add this
@@ -125,7 +126,7 @@ function Payment() {
           // Verify payment on backend
           try {
             await axios.post(
-              'http://localhost:5000/payments/verify',
+              `${API_BASE_URL}/payments/verify`,
               {
                 orderId: orderId,
                 razorpayOrderId: response.razorpay_order_id,

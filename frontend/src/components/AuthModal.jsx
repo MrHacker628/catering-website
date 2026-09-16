@@ -271,6 +271,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../apiConfig';
 import './AuthModal.css';
 
 function AuthModal({ onClose, onLoginSuccess }) {
@@ -307,7 +308,7 @@ function AuthModal({ onClose, onLoginSuccess }) {
     }
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', loginData);
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, loginData);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       setLoading(false);
@@ -335,7 +336,7 @@ function AuthModal({ onClose, onLoginSuccess }) {
     }
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/auth/signup', signupData);
+      const response = await axios.post(`${API_BASE_URL}/auth/signup`, signupData);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       setLoading(false);

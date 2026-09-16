@@ -26,7 +26,7 @@
 //   var scrollRef = useRef(null);
 
 //   useEffect(function() {
-//     axios.get('http://localhost:5000/reviews/google')
+//     axios.get(`${API_BASE_URL}/reviews/google`)
 //       .then(function(res) {
 //         setData(res.data);
 //       })
@@ -146,6 +146,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../apiConfig';
 import './GoogleReviews.css';
 
 // ── JSON-LD Schema Block ──────────────────────────────────────────────────────
@@ -231,7 +232,7 @@ function GoogleReviews() {
   var scrollRef = useRef(null);
 
   useEffect(function() {
-    axios.get('http://localhost:5000/reviews/google')
+    axios.get(`${API_BASE_URL}/reviews/google`)
       .then(function(res) {
         setData(res.data);
       })
