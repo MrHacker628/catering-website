@@ -614,6 +614,21 @@ function Admin() {
     });
   }
 
+  // ── DELETE ORDER (admin only) ──
+  function deleteOrder(orderId) {
+    if (!window.confirm(`Permanently delete order #${orderId}? This cannot be undone.`)) {
+      return;
+    }
+    const token = localStorage.getItem('admin_token');
+    axios.delete(`http://localhost:5000/orders/${orderId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).then(function () {
+      fetchAllData();
+    }).catch(function (error) {
+      alert(error.response?.data?.message || '❌ Failed to delete order.');
+    });
+  }
+
   // ── INVENTORY FORM STATE (unchanged) ──
   const [newItem, setNewItem] = useState({
     item_name: '', category: '', quantity: '',
@@ -836,6 +851,7 @@ function Admin() {
                       <th>Advance</th>
                       <th>Status</th>
                       <th>Update</th>
+                      <th>Delete</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -871,6 +887,15 @@ function Admin() {
                               <option value="completed">Completed</option>
                               <option value="cancelled">Cancelled</option>
                             </select>
+                          </td>
+                          <td>
+                            <button
+                              className="delete-btn"
+                              onClick={() => deleteOrder(order.id)}
+                              aria-label={`Delete order #${order.id}`}
+                            >
+                              🗑 Delete
+                            </button>
                           </td>
                         </tr>
                       );

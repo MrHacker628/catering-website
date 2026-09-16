@@ -218,5 +218,60 @@ router.put('/status/:id', requireAdmin, function (req, res) {
 
 
 
+// =============================================
+// ROUTE 5 — Delete an order (admin only)
+// DELETE request — permanently removes an order
+//
+// payments.order_id has a foreign key constraint on orders(id) with no
+// ON DELETE CASCADE, so any payment record tied to this order is deleted
+// first, inside the same transaction — otherwise deleting an order that
+// already has a payment row would fail with a FK constraint error.
+// =============================================
+router.delete('/:id', requireAdmin, function (req, res) {
+
+    const orderId = req.params.id;
+
+    db.beginTransaction(function (err) {
+        if (err) {
+            console.log("❌ Transaction start failed:", err);
+            return res.status(500).json({ message: "Server error" });
+        }
+
+        db.query('DELETE FROM payments WHERE order_id = ?', [orderId], function (err) {
+            if (err) {
+                return db.rollback(function () {
+                    console.log("❌ Error deleting related payments:", err);
+                    res.status(500).json({ message: "Error deleting order" });
+                });
+            }
+
+            db.query('DELETE FROM orders WHERE id = ?', [orderId], function (err, result) {
+                if (err) {
+                    return db.rollback(function () {
+                        console.log("❌ Error deleting order:", err);
+                        res.status(500).json({ message: "Error deleting order" });
+                    });
+                }
+
+                if (result.affectedRows === 0) {
+                    return db.rollback(function () {
+                        res.status(404).json({ message: "Order not found" });
+                    });
+                }
+
+                db.commit(function (err) {
+                    if (err) {
+                        return db.rollback(function () {
+                            console.log("❌ Commit failed! Rolled back!");
+                            res.status(500).json({ message: "Failed to delete order" });
+                        });
+                    }
+                    res.status(200).json({ message: "✅ Order deleted successfully!" });
+                });
+            });
+        });
+    });
+});
+
 // Export router
 module.exports = router;
