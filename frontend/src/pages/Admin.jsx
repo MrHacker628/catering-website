@@ -530,11 +530,12 @@ import './Admin.css';
 
 function Admin() {
 
-  // ── AUTH STATE (unchanged) ──
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // ── AUTH STATE ──
+  // isAuthenticated starts true if a still-valid admin token is already
+  // stored, so a page refresh doesn't force logging in again for no reason.
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('admin_token'));
   const [passwordInput,   setPasswordInput]   = useState('');
   const [passwordError,   setPasswordError]   = useState('');
-  const ADMIN_PASSWORD = 'mannat2026';
 
   const [activeTab,   setActiveTab]   = useState('orders');
 
@@ -545,20 +546,27 @@ function Admin() {
   const [payments,  setPayments]  = useState([]);
   const [loading,   setLoading]   = useState(false);
 
-  // ── AUTH HANDLER (unchanged) ──
+  // ── AUTH HANDLER ──
+  // Actually logs in against the backend now, instead of just checking a
+  // hardcoded password client-side — that never called the API, so no real
+  // token was ever obtained, and every admin request below failed with 401.
   function handlePasswordSubmit() {
-    if (passwordInput === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      setPasswordInput('');
-    } else {
-      setPasswordError('❌ Wrong password. Try again!');
-    }
+    axios.post('http://localhost:5000/auth/admin-login', { password: passwordInput })
+      .then(function (res) {
+        localStorage.setItem('admin_token', res.data.token);
+        setIsAuthenticated(true);
+        setPasswordInput('');
+        setPasswordError('');
+      })
+      .catch(function (error) {
+        setPasswordError(error.response?.data?.message || '❌ Wrong password. Try again!');
+      });
   }
 
-  // ── FETCH ALL DATA (unchanged) ──
+  // ── FETCH ALL DATA ──
   function fetchAllData() {
     setLoading(true);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('admin_token');
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
     Promise.all([
@@ -578,22 +586,31 @@ function Admin() {
       .catch(function (error) {
         console.log("❌ Error:", error.response?.data);
         setLoading(false);
+        // Token missing/expired — send back to the login screen instead of
+        // silently leaving a broken/empty dashboard on screen.
+        if (error.response?.status === 401) {
+          localStorage.removeItem('admin_token');
+          setIsAuthenticated(false);
+        }
       });
   }
 
-  // ── UPDATE ORDER STATUS (unchanged) ──
+  // ── UPDATE ORDER STATUS ──
+  // Was firing two separate PUT calls to the same endpoint: one with the
+  // wrong body key ({status}, silently NULLing order_status server-side)
+  // and no auth header, one with the right key but also no auth header —
+  // so a status change (including cancelling an order) never actually
+  // persisted, which is why cancelling never reflected on the calendar.
   function updateOrderStatus(orderId, newStatus) {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('admin_token');
     axios.put(`http://localhost:5000/orders/status/${orderId}`,
-      { status: newStatus },
-      { headers: { Authorization: `Bearer ${token}` }}
-    ).then(function() { fetchAllData(); });
-
-    axios.put(`http://localhost:5000/orders/status/${orderId}`, {
-      order_status: newStatus
-    }).then(function () {
+      { order_status: newStatus },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).then(function () {
       fetchAllData();
       alert('✅ Order status updated!');
+    }).catch(function (error) {
+      alert(error.response?.data?.message || '❌ Failed to update order status.');
     });
   }
 
@@ -612,7 +629,7 @@ function Admin() {
       alert('Please fill item name and quantity!');
       return;
     }
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('admin_token');
     axios.post('http://localhost:5000/inventory/add', newItem,
       { headers: { Authorization: `Bearer ${token}` }}
     ).then(function() {
@@ -624,7 +641,7 @@ function Admin() {
 
   function deleteInventoryItem(itemId) {
     if (window.confirm('Are you sure you want to delete?')) {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('admin_token');
       axios.delete(`http://localhost:5000/inventory/delete/${itemId}`,
         { headers: { Authorization: `Bearer ${token}` }}
       ).then(function() { fetchAllData(); });
@@ -731,6 +748,16 @@ function Admin() {
               <div className="sidebar-user-role">Full access</div>
             </div>
           </div>
+          <button
+            className="topbar-refresh-btn"
+            style={{ width: '100%', marginTop: '10px' }}
+            onClick={() => {
+              localStorage.removeItem('admin_token');
+              setIsAuthenticated(false);
+            }}
+          >
+            Logout
+          </button>
         </div>
 
       </aside>

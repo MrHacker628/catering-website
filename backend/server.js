@@ -9,6 +9,7 @@ require('dotenv').config(); // loads .env variables
 const app = express();
 
 const verifyToken = require('./middleware/auth');
+const requireAdmin = require('./middleware/requireAdmin');
 
 
 
@@ -67,9 +68,9 @@ app.listen(PORT, function () {
 const customerRoutes = require('./routes/customers');
 app.use('/customers', verifyToken, customerRoutes);
 
-// Inventory routes (protected)
+// Inventory routes (protected, admin only)
 const inventoryRoutes = require('./routes/inventory');
-app.use('/inventory', verifyToken, inventoryRoutes);
+app.use('/inventory', verifyToken, requireAdmin, inventoryRoutes);
 
 // Menu routes (public)
 const menuRoutes = require('./routes/menu');
@@ -77,7 +78,6 @@ app.use('/menu', menuRoutes);
 
 // Order routes (protected)
 const orderRoutes = require('./routes/orders');
-app.use('/orders/booked-dates', orderRoutes);
 app.use('/orders', verifyToken, orderRoutes);
 
 // Payment routes (protected)

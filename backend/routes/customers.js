@@ -13,6 +13,7 @@ const router = express.Router();
 const db = require('../db');
 // '../db' means go ONE folder up (from routes to backend)
 // then find db.js
+const requireAdmin = require('../middleware/requireAdmin');
 
 
 // =============================================
@@ -96,7 +97,7 @@ router.post('/add', function(req, res) {
 // GET means we are FETCHING data from server
 // This runs when Admin page loads
 // =============================================
-router.get('/all', function(req, res) {
+router.get('/all', requireAdmin, function(req, res) {
     // SQL query to get all customers
     // ORDER BY created_at DESC = newest customer first
     const sql = 'SELECT * FROM customers ORDER BY created_at DESC';

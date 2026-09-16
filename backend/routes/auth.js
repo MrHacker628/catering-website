@@ -151,6 +151,33 @@ router.post('/login', function (req, res) {
 
 
 // =============================================
+// ROUTE — Admin login
+// POST request — admin dashboard password screen
+// Checks the password against ADMIN_PASSWORD in .env (never in frontend
+// code) and issues a real JWT with role: 'admin', so admin-only routes
+// can tell it apart from a regular customer's token.
+// =============================================
+router.post('/admin-login', function (req, res) {
+    const { password } = req.body;
+
+    if (!password || password !== process.env.ADMIN_PASSWORD) {
+        res.status(401).json({ message: "❌ Wrong password. Try again!" });
+        return;
+    }
+
+    const token = jwt.sign(
+        { role: 'admin' },
+        JWT_SECRET,
+        { expiresIn: '12h' } // shorter-lived than customer tokens — admin session, re-login daily
+    );
+
+    res.status(200).json({
+        message: "✅ Admin login successful!",
+        token: token
+    });
+});
+
+// =============================================
 // ROUTE 3 — Get logged in user's profile
 // GET request — called when page loads
 // checks if token is still valid

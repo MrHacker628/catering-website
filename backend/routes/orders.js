@@ -8,6 +8,7 @@ const router = express.Router();
 
 // Import database connection
 const db = require('../db');
+const requireAdmin = require('../middleware/requireAdmin');
 
 
 
@@ -134,7 +135,7 @@ router.get('/booked-dates', function (req, res) {
 // GET request — admin views all bookings
 // JOIN combines orders with customer names
 // =============================================
-router.get('/all', function (req, res) {
+router.get('/all', requireAdmin, function (req, res) {
 
     // JOIN query — gets order details WITH customer name
     // Instead of just showing customer_id, we show their name
@@ -185,13 +186,20 @@ router.get('/customer/:customer_id', function (req, res) {
 // ROUTE 4 — Update order status (admin only)
 // PUT request — admin confirms or cancels order
 // =============================================
-router.put('/status/:id', function (req, res) {
+router.put('/status/:id', requireAdmin, function (req, res) {
 
     const orderId = req.params.id;
 
     // order_status can be:
     // 'pending' / 'confirmed' / 'completed' / 'cancelled'
     const { order_status } = req.body;
+
+    const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+    if (!validStatuses.includes(order_status)) {
+        return res.status(400).json({
+            message: "❌ Invalid order_status. Must be one of: " + validStatuses.join(', ')
+        });
+    }
 
     const sql = 'UPDATE orders SET order_status = ? WHERE id = ?';
 

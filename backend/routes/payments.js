@@ -6,6 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const requireAdmin = require('../middleware/requireAdmin');
 
 // Import Razorpay package
 const Razorpay = require('razorpay');
@@ -168,7 +169,7 @@ router.post('/verify', function(req, res) {
 // ROUTE 3 — Get ALL payments (admin only)
 // GET request — admin views all transactions
 // =============================================
-router.get('/all', function(req, res) {
+router.get('/all', requireAdmin, function(req, res) {
 
     // JOIN query gets payment details WITH
     // customer name and order event type
