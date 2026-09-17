@@ -847,6 +847,27 @@ function Booking({ currentUser }) {
         getAuthHeaders()
       );
 
+      const menuDetails = customMenuData
+        ? {
+            type: 'custom',
+            items: customMenuData.selectedItems.map(function (item) {
+              return {
+                name: item.item_name,
+                isVeg: !!item.is_veg,
+                pricePerPerson: item.price_per_person || 50,
+              };
+            }),
+          }
+        : {
+            type: 'package',
+            packageName: selectedPackage.package_name,
+            packageType: selectedPackage.package_type,
+            welcomeDrink: selectedPackage.welcome_drink,
+            mainCourse: selectedPackage.main_course,
+            desserts: selectedPackage.desserts,
+            extras: selectedPackage.extras,
+          };
+
       sessionStorage.setItem('bookingDetails', JSON.stringify({
         customerName: customerData.full_name,
         customerEmail: customerData.email,
@@ -854,8 +875,9 @@ function Booking({ currentUser }) {
         eventType: eventData.event_type,
         eventDate: eventData.event_date,
         eventLocation: eventData.event_location,
-        numGuests: eventData.num_of_guests,
+        numGuests: customMenuData ? customMenuData.numPeople : eventData.num_of_guests,
         packageName: customMenuData ? 'Custom Menu' : selectedPackage.package_name,
+        menuDetails,
         totalAmount: price.total,
         advanceAmount: Math.round(price.total * 0.3),
       }));

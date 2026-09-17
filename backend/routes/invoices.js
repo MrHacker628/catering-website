@@ -59,7 +59,8 @@ router.post('/send', async function (req, res) {
         eventDate,
         eventLocation,
         numGuests,
-        menuSelected,
+        packageName,
+        menuDetails,
         totalAmount,
         advanceAmount,
         balanceAmount,
@@ -84,7 +85,8 @@ router.post('/send', async function (req, res) {
             eventDate,
             eventLocation,
             numGuests,
-            menuSelected,
+            packageName,
+            menuDetails,
             totalAmount,
             advanceAmount,
             balanceAmount,
@@ -307,6 +309,15 @@ function generateInvoicePDF(data) {
         doc.text(`Order ID: #${data.orderId}`, 50, y);
 
 
+        // Helper — starts a fresh page (with bottom strip) if the next
+        // block of the given height won't fit above the footer margin.
+        function ensureSpace(neededHeight) {
+            if (y + neededHeight > doc.page.height - 70) {
+                doc.addPage();
+                y = 50;
+            }
+        }
+
         // ─────────────────────────────────────────
         // BOOKING DETAILS TABLE
         // ─────────────────────────────────────────
@@ -323,7 +334,7 @@ function generateInvoicePDF(data) {
         y += 22;
 
         // Row 1 — Event location + details
-        doc.rect(50, y, pageWidth, 80).fill(LIGHT_GREY).stroke('#dddddd');
+        doc.rect(50, y, pageWidth, 66).fill(LIGHT_GREY).stroke('#dddddd');
 
         doc.fillColor(DARK_GREY).fontSize(9).font('Helvetica-Bold')
            .text('1', 60, y + 8);
@@ -332,13 +343,56 @@ function generateInvoicePDF(data) {
            .text(`LOCATION: ${data.eventLocation}`,              120, y + 8)
            .text(`EVENT DATE: ${formatDate(data.eventDate)}`,    120, y + 22)
            .text(`TENTATIVE PLATES: ${data.numGuests} (10% Backup)`, 120, y + 36)
-           .text(`PACKAGE / MENU: ${data.menuSelected}`,         120, y + 50, { width: 300 });
+           .text(`PACKAGE: ${data.packageName || 'Custom Menu'}`, 120, y + 50, { width: 300 });
 
         // Amount column
         doc.font('Helvetica-Bold').fontSize(10).fillColor(PURPLE)
-           .text(`Rs. ${Number(data.totalAmount).toLocaleString('en-IN')}/-`, 430, y + 28);
+           .text(`Rs. ${Number(data.totalAmount).toLocaleString('en-IN')}/-`, 430, y + 24);
 
-        y += 90;
+        y += 76;
+
+
+        // ─────────────────────────────────────────
+        // MENU DETAILS
+        // Lists the actual dishes included — either
+        // the selected package's courses, or the full
+        // custom-menu item list.
+        // ─────────────────────────────────────────
+
+        ensureSpace(30);
+        doc.fillColor(PURPLE).fontSize(11).font('Helvetica-Bold')
+           .text('MENU DETAILS', 50, y);
+        y += 16;
+
+        if (data.menuDetails && data.menuDetails.type === 'custom' && Array.isArray(data.menuDetails.items)) {
+            data.menuDetails.items.forEach(function (item, idx) {
+                ensureSpace(14);
+                doc.fillColor(DARK_GREY).fontSize(9).font('Helvetica')
+                   .text(`${idx + 1}. ${item.name} (${item.isVeg ? 'Veg' : 'Non-Veg'})`, 60, y, { width: pageWidth - 20 });
+                y += 14;
+            });
+        } else if (data.menuDetails && data.menuDetails.type === 'package') {
+            const sections = [
+                ['Welcome Drink', data.menuDetails.welcomeDrink],
+                ['Main Course',   data.menuDetails.mainCourse],
+                ['Desserts',      data.menuDetails.desserts],
+                ['Extras',        data.menuDetails.extras],
+            ];
+            sections.forEach(function ([label, value]) {
+                if (!value) return;
+                ensureSpace(28);
+                doc.fillColor(PURPLE).fontSize(9).font('Helvetica-Bold').text(`${label}:`, 60, y);
+                y += 12;
+                doc.fillColor(DARK_GREY).fontSize(8.5).font('Helvetica');
+                doc.text(value, 60, y, { width: pageWidth - 20, lineGap: 2 });
+                y += doc.heightOfString(value, { width: pageWidth - 20 }) + 8;
+            });
+        } else {
+            doc.fillColor(DARK_GREY).fontSize(9).font('Helvetica').text('N/A', 60, y);
+            y += 14;
+        }
+
+        y += 10;
 
 
         // ─────────────────────────────────────────
@@ -347,6 +401,7 @@ function generateInvoicePDF(data) {
 
         // Helper to draw a summary row
         function drawRow(label, value, bgColor, bold) {
+            ensureSpace(22);
             doc.rect(50, y, pageWidth, 22).fill(bgColor || WHITE).stroke('#dddddd');
             doc.fillColor(DARK_GREY)
                .fontSize(10)
@@ -364,6 +419,7 @@ function generateInvoicePDF(data) {
         y += 5;
 
         // Grand Total box (full width, highlighted)
+        ensureSpace(28);
         doc.rect(50, y, pageWidth, 28).fill(PURPLE);
         doc.fillColor(WHITE).fontSize(12).font('Helvetica-Bold')
            .text('GRAND TOTAL', 120, y + 8)
@@ -377,6 +433,7 @@ function generateInvoicePDF(data) {
         // Matches your actual bill's terms section
         // ─────────────────────────────────────────
 
+        ensureSpace(16);
         doc.fillColor(PURPLE).fontSize(11).font('Helvetica-Bold')
            .text('PAYMENT TERMS', 50, y);
 
@@ -391,8 +448,10 @@ function generateInvoicePDF(data) {
 
         doc.fillColor(DARK_GREY).fontSize(8.5).font('Helvetica');
         terms.forEach(term => {
+            const h = doc.heightOfString(term, { width: pageWidth });
+            ensureSpace(h + 6);
             doc.text(term, 50, y, { width: pageWidth, lineGap: 2 });
-            y += doc.heightOfString(term, { width: pageWidth }) + 6;
+            y += h + 6;
         });
 
 
@@ -400,6 +459,7 @@ function generateInvoicePDF(data) {
         // FOOTER — Signature + Thank you
         // ─────────────────────────────────────────
 
+        ensureSpace(90);
         y += 15;
 
         doc.moveTo(50, y).lineTo(545, y).lineWidth(0.5).stroke('#cccccc');
@@ -419,13 +479,19 @@ function generateInvoicePDF(data) {
            .text('It is always our pleasure to serve you.', 350, y + 26, { align: 'right', width: 195 });
 
         // Bottom purple strip
+        // Sits below PDFKit's default bottom margin, so its text would
+        // otherwise silently trigger an unwanted extra page — disable
+        // auto page-breaking just for this call, then restore it.
         doc.rect(50, doc.page.height - 45, pageWidth, 25).fill(PURPLE);
+        const savedBottomMargin = doc.page.margins.bottom;
+        doc.page.margins.bottom = 0;
         doc.fillColor(WHITE).fontSize(8).font('Helvetica')
            .text(
                'Shop No.14, Near Vodafone Gallery, Vasco-da-Gama, Goa  |  8329570966 / 9175868667  |  mannatcaterersgoa@gmail.com',
                50, doc.page.height - 38,
                { align: 'center', width: pageWidth }
            );
+        doc.page.margins.bottom = savedBottomMargin;
 
         // Finalize — triggers the 'end' event which resolves the Promise
         doc.end();
