@@ -27,18 +27,20 @@ router.post('/add', function (req, res) {
         event_location,
         num_of_guests,
         package_id,
-        menu_selected,
         total_amount,
-        advance_amount
+        advance_amount,
+        extras_details
     } = req.body;
 
 
-    // ── VALIDATE guests must be 500 or 600 only (skip for custom menu) ──
+    // ── VALIDATE guests is a real positive number ──
+    // (any count is allowed now, as long as it meets the chosen package's
+    // min_guests — that's enforced client-side at booking time)
     const { is_custom_menu } = req.body;
-    const allowedGuests = [500, 600];
-    if (!is_custom_menu && !allowedGuests.includes(parseInt(num_of_guests))) {
+    const guestsNum = parseInt(num_of_guests);
+    if (!guestsNum || guestsNum < 1) {
         return res.status(400).json({
-            message: "Number of guests must be either 500 or 600."
+            message: "Enter a valid number of guests."
         });
     }
 
@@ -57,16 +59,16 @@ router.post('/add', function (req, res) {
         console.log("🔄 Transaction started!");
 
         // STEP 2 — Insert order
-        const sql = `INSERT INTO orders 
-            (customer_id, event_type, event_date, event_location, 
-            num_of_guests, package_id, total_amount,      
-            advance_amount, balance_amount) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO orders
+            (customer_id, event_type, event_date, event_location,
+            num_of_guests, package_id, total_amount,
+            advance_amount, balance_amount, extras_details)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         db.query(sql, [
             customer_id, event_type, event_date, event_location,
             num_of_guests, package_id, total_amount,
-            advance_amount, balance_amount
+            advance_amount, balance_amount, extras_details || null
         ], function (err, result) {
 
             if (err) {

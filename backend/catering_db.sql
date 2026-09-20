@@ -129,6 +129,7 @@ CREATE TABLE `orders` (
   `order_status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `is_custom_menu` tinyint(1) DEFAULT '0',
+  `extras_details` text,
   PRIMARY KEY (`id`),
   KEY `customer_id` (`customer_id`),
   CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)

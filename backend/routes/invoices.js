@@ -387,6 +387,29 @@ function generateInvoicePDF(data) {
                 doc.text(value, 60, y, { width: pageWidth - 20, lineGap: 2 });
                 y += doc.heightOfString(value, { width: pageWidth - 20 }) + 8;
             });
+
+            // Extra dishes added on top of the package, if any
+            if (Array.isArray(data.menuDetails.extraItems) && data.menuDetails.extraItems.length > 0) {
+                ensureSpace(24);
+                doc.fillColor(PURPLE).fontSize(9).font('Helvetica-Bold').text('Extra Dishes Added:', 60, y);
+                y += 12;
+                doc.fillColor(DARK_GREY).fontSize(8.5).font('Helvetica');
+                data.menuDetails.extraItems.forEach(function (item) {
+                    ensureSpace(13);
+                    doc.text(`• ${item.name} — Rs. ${item.pricePerPerson}/plate`, 60, y, { width: pageWidth - 20 });
+                    y += 13;
+                });
+                y += 6;
+            }
+
+            // Extra waiters added on top of the package, if any
+            if (data.menuDetails.extraWaiters > 0) {
+                ensureSpace(20);
+                doc.fillColor(PURPLE).fontSize(9).font('Helvetica-Bold').text('Extra Waiters:', 60, y);
+                doc.fillColor(DARK_GREY).fontSize(8.5).font('Helvetica')
+                   .text(`${data.menuDetails.extraWaiters} extra waiter(s) @ Rs. 800 each`, 160, y);
+                y += 18;
+            }
         } else {
             doc.fillColor(DARK_GREY).fontSize(9).font('Helvetica').text('N/A', 60, y);
             y += 14;
@@ -410,6 +433,26 @@ function generateInvoicePDF(data) {
             doc.font('Helvetica-Bold').fillColor(bold ? PURPLE : DARK_GREY)
                .text(value, 430, y + 6);
             y += 22;
+        }
+
+        // Itemized cost breakdown for a package booking (package + any
+        // extra dishes / extra waiters added on top of it)
+        if (data.menuDetails && data.menuDetails.type === 'package' && data.menuDetails.packageTotal != null) {
+            drawRow(
+                `PACKAGE AMOUNT (Rs. ${data.menuDetails.perPlate}/plate x ${data.numGuests})`,
+                `Rs. ${Number(data.menuDetails.packageTotal).toLocaleString('en-IN')}/-`,
+                WHITE, false
+            );
+            if (data.menuDetails.extraItemsTotal > 0) {
+                drawRow('EXTRA DISHES SUBTOTAL', `Rs. ${Number(data.menuDetails.extraItemsTotal).toLocaleString('en-IN')}/-`, WHITE, false);
+            }
+            if (data.menuDetails.waitersTotal > 0) {
+                drawRow(
+                    `EXTRA WAITERS (${data.menuDetails.extraWaiters} x Rs. 800)`,
+                    `Rs. ${Number(data.menuDetails.waitersTotal).toLocaleString('en-IN')}/-`,
+                    WHITE, false
+                );
+            }
         }
 
         drawRow('TOTAL AMOUNT',                 `Rs. ${Number(data.totalAmount).toLocaleString('en-IN')}/-`,   LIGHT_GREY, false);

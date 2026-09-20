@@ -673,6 +673,9 @@ import './Booking.css';
 import LocationPicker from './LocationPicker';
 import { useLocation } from 'react-router-dom';
 import { API_BASE_URL } from '../apiConfig';
+import { client } from '../sanityClient';
+
+const EXTRA_WAITER_PRICE = 800;
 
 function Booking({ currentUser }) {
 
@@ -687,6 +690,12 @@ function Booking({ currentUser }) {
   // ── PACKAGES — UNCHANGED ──
   const [packages, setPackages] = useState([]);
   const [selectedPackage, setSelectedPackage] = useState(null);
+
+  // ── EXTRA DISHES + EXTRA WAITERS (add-ons on top of a package) ──
+  const [availableDishes, setAvailableDishes] = useState([]);
+  const [dishToAdd, setDishToAdd] = useState('');
+  const [extraItems, setExtraItems] = useState([]); // [{ id, name, pricePerPerson }]
+  const [extraWaiters, setExtraWaiters] = useState(0);
 
   // ── CUSTOMER DETAILS — UNCHANGED ──
   const [customerData, setCustomerData] = useState({
@@ -719,6 +728,35 @@ function Booking({ currentUser }) {
         console.log("Error fetching packages:", error);
       });
   }, []);
+
+  // ── FETCH MENU ITEMS FOR THE "EXTRA DISH" PICKER ──
+  useEffect(() => {
+    const query = `*[_type == "menuItem"]{ _id, name, price }`;
+    client.fetch(query).then(function (data) {
+      const mapped = data
+        .filter(function (item) { return item.price != null; })
+        .map(function (item) {
+          return { id: item._id, name: item.name, pricePerPerson: item.price };
+        });
+      setAvailableDishes(mapped);
+    }).catch(function (error) {
+      console.log("Error fetching menu items for extra dishes:", error);
+    });
+  }, []);
+
+  // ── ADD / REMOVE EXTRA DISHES ──
+  function addExtraItem() {
+    if (!dishToAdd) return;
+    const dish = availableDishes.find(function (d) { return d.id === dishToAdd; });
+    if (!dish) return;
+    if (extraItems.some(function (i) { return i.id === dish.id; })) return;
+    setExtraItems(function (prev) { return [...prev, dish]; });
+    setDishToAdd('');
+  }
+
+  function removeExtraItem(id) {
+    setExtraItems(function (prev) { return prev.filter(function (i) { return i.id !== id; }); });
+  }
 
   // ── AUTO-FILL USER DETAILS — UNCHANGED ──
   useEffect(function () {
@@ -754,21 +792,41 @@ function Booking({ currentUser }) {
     setSelectedPackage(pkg);
   }
 
-  // ── PRICE CALCULATION — UNCHANGED ──
+  // ── PRICE CALCULATION ──
+  // Guest count is no longer locked to exactly 500 or 600 — any count is
+  // allowed (at least the package's min_guests). The 500-guest per-plate
+  // rate applies below 600 guests, and the 600-guest rate applies at 600+.
   function getPrice() {
     if (customMenuData) {
       return {
         total: customMenuData.totalCost,
         perPlate: Math.round(customMenuData.totalCost / customMenuData.numPeople),
-        guests: customMenuData.numPeople
+        guests: customMenuData.numPeople,
+        packageTotal: customMenuData.totalCost,
+        extraItemsTotal: 0,
+        waitersTotal: 0,
       };
     }
     if (!selectedPackage || !eventData.num_of_guests) return null;
-    if (eventData.num_of_guests === '500') {
-      return { total: selectedPackage.total_500, perPlate: selectedPackage.price_500, guests: 500 };
-    } else {
-      return { total: selectedPackage.total_600, perPlate: selectedPackage.price_600, guests: 600 };
-    }
+
+    const guests = parseInt(eventData.num_of_guests);
+    if (!guests || guests < selectedPackage.min_guests) return null;
+
+    const perPlate = guests >= 600 ? selectedPackage.price_600 : selectedPackage.price_500;
+    const packageTotal = perPlate * guests;
+    const extraItemsTotal = extraItems.reduce(function (sum, item) {
+      return sum + item.pricePerPerson * guests;
+    }, 0);
+    const waitersTotal = (parseInt(extraWaiters) || 0) * EXTRA_WAITER_PRICE;
+
+    return {
+      total: packageTotal + extraItemsTotal + waitersTotal,
+      perPlate,
+      guests,
+      packageTotal,
+      extraItemsTotal,
+      waitersTotal,
+    };
   }
 
   // ── VALIDATE STEP 1 — UNCHANGED ──
@@ -791,7 +849,11 @@ function Booking({ currentUser }) {
       }
     }
     if (!eventData.event_location) newErrors.event_location = 'Location is required!';
-    if (!customMenuData && !eventData.num_of_guests) newErrors.num_of_guests = 'Select number of guests!';
+    if (!customMenuData && !eventData.num_of_guests) {
+      newErrors.num_of_guests = 'Enter number of guests!';
+    } else if (!customMenuData && selectedPackage && parseInt(eventData.num_of_guests) < selectedPackage.min_guests) {
+      newErrors.num_of_guests = `Minimum ${selectedPackage.min_guests} guests required for this package!`;
+    }
     if (!customMenuData && !selectedPackage) newErrors.package = 'Please select a package!';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -831,22 +893,6 @@ function Booking({ currentUser }) {
       );
       const customerId = custRes.data.customerId;
 
-      const orderRes = await axios.post(
-        `${API_BASE_URL}/orders/add`,
-        {
-          customer_id: customerId,
-          event_type: eventData.event_type,
-          event_date: eventData.event_date,
-          event_location: eventData.event_location,
-          num_of_guests: customMenuData ? customMenuData.numPeople : eventData.num_of_guests,
-          package_id: customMenuData ? null : selectedPackage.id,
-          is_custom_menu: customMenuData ? 1 : 0,
-          total_amount: price.total,
-          advance_amount: Math.round(price.total * 0.3),
-        },
-        getAuthHeaders()
-      );
-
       const menuDetails = customMenuData
         ? {
             type: 'custom',
@@ -866,7 +912,35 @@ function Booking({ currentUser }) {
             mainCourse: selectedPackage.main_course,
             desserts: selectedPackage.desserts,
             extras: selectedPackage.extras,
+            extraItems: extraItems.map(function (item) {
+              return { name: item.name, pricePerPerson: item.pricePerPerson };
+            }),
+            extraWaiters: parseInt(extraWaiters) || 0,
+            perPlate: price.perPlate,
+            packageTotal: price.packageTotal,
+            extraItemsTotal: price.extraItemsTotal,
+            waitersTotal: price.waitersTotal,
           };
+
+      const orderRes = await axios.post(
+        `${API_BASE_URL}/orders/add`,
+        {
+          customer_id: customerId,
+          event_type: eventData.event_type,
+          event_date: eventData.event_date,
+          event_location: eventData.event_location,
+          num_of_guests: customMenuData ? customMenuData.numPeople : eventData.num_of_guests,
+          package_id: customMenuData ? null : selectedPackage.id,
+          is_custom_menu: customMenuData ? 1 : 0,
+          total_amount: price.total,
+          advance_amount: Math.round(price.total * 0.3),
+          extras_details: customMenuData ? null : JSON.stringify({
+            extraItems: menuDetails.extraItems,
+            extraWaiters: menuDetails.extraWaiters,
+          }),
+        },
+        getAuthHeaders()
+      );
 
       sessionStorage.setItem('bookingDetails', JSON.stringify({
         customerName: customerData.full_name,
@@ -1288,27 +1362,26 @@ function Booking({ currentUser }) {
                       )}
                     </div>
 
-                    {/* Guests — conditional UNCHANGED */}
+                    {/* Guests — free number entry, must meet the selected package's minimum */}
                     {!customMenuData && (
                       <div className="bk-field">
                         <label className="bk-label" htmlFor="num_of_guests">
                           Number of Guests <span className="bk-required" aria-hidden="true">*</span>
                         </label>
-                        <div className={`bk-input-wrap bk-input-wrap--select ${errors.num_of_guests ? 'bk-input-wrap--error' : ''}`}>
+                        <div className={`bk-input-wrap ${errors.num_of_guests ? 'bk-input-wrap--error' : ''}`}>
                           <span className="bk-input-icon" aria-hidden="true">👥</span>
-                          <select
+                          <input
                             id="num_of_guests"
-                            className="bk-select"
+                            className="bk-input"
+                            type="number"
+                            min={selectedPackage ? selectedPackage.min_guests : 1}
                             name="num_of_guests"
+                            placeholder={selectedPackage ? `Min. ${selectedPackage.min_guests} guests` : 'e.g. 300'}
                             value={eventData.num_of_guests}
                             onChange={handleEventChange}
                             aria-required="true"
                             aria-describedby={errors.num_of_guests ? 'err-num_of_guests' : undefined}
-                          >
-                            <option value="">Select number of guests</option>
-                            <option value="500">500 Guests</option>
-                            <option value="600">600 Guests</option>
-                          </select>
+                          />
                         </div>
                         {errors.num_of_guests && (
                           <span id="err-num_of_guests" className="bk-error" role="alert">{errors.num_of_guests}</span>
@@ -1387,7 +1460,68 @@ function Booking({ currentUser }) {
                             )}
                           </div>
 
-                          {/* Price block — conditional/logic UNCHANGED */}
+                          {/* ── EXTRA DISHES (add-on to the package) ── */}
+                          <div className="bk-extras-block">
+                            <div className="bk-extras-block__label">🍛 Add Extra Dishes (optional)</div>
+                            <div className="bk-extras-picker-row">
+                              <select
+                                value={dishToAdd}
+                                onChange={(e) => setDishToAdd(e.target.value)}
+                                aria-label="Choose an extra dish to add"
+                              >
+                                <option value="">Choose a dish…</option>
+                                {availableDishes
+                                  .filter((d) => !extraItems.some((i) => i.id === d.id))
+                                  .map((d) => (
+                                    <option key={d.id} value={d.id}>
+                                      {d.name} — ₹{d.pricePerPerson}/plate
+                                    </option>
+                                  ))}
+                              </select>
+                              <button
+                                type="button"
+                                className="bk-extras-add-btn"
+                                onClick={addExtraItem}
+                                disabled={!dishToAdd}
+                              >
+                                Add
+                              </button>
+                            </div>
+                            {extraItems.length > 0 && (
+                              <ul className="bk-extras-list">
+                                {extraItems.map((item) => (
+                                  <li key={item.id} className="bk-extras-list__item">
+                                    <span>{item.name} — ₹{item.pricePerPerson}/plate</span>
+                                    <button
+                                      type="button"
+                                      className="bk-extras-list__remove"
+                                      onClick={() => removeExtraItem(item.id)}
+                                      aria-label={`Remove ${item.name}`}
+                                    >
+                                      ✕
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+
+                          {/* ── EXTRA WAITERS (add-on to the package) ── */}
+                          <div className="bk-extras-block">
+                            <div className="bk-extras-block__label">🧑‍🍳 Extra Waiters (optional)</div>
+                            <div className="bk-waiters-field">
+                              <input
+                                type="number"
+                                min="0"
+                                value={extraWaiters}
+                                onChange={(e) => setExtraWaiters(e.target.value)}
+                                aria-label="Number of extra waiters"
+                              />
+                              <span>× ₹{EXTRA_WAITER_PRICE}/waiter</span>
+                            </div>
+                          </div>
+
+                          {/* Price block */}
                           {price && (
                             <div className="bk-price-preview">
                               <div className="bk-price-preview__row">
@@ -1397,6 +1531,22 @@ function Booking({ currentUser }) {
                                 Total: ₹{price.total.toLocaleString()}
                               </div>
                               <div className="bk-price-preview__breakdown">
+                                <div className="bk-price-preview__breakdown-item">
+                                  <span>📦 Package Amount</span>
+                                  <strong>₹{price.packageTotal.toLocaleString()}</strong>
+                                </div>
+                                {price.extraItemsTotal > 0 && (
+                                  <div className="bk-price-preview__breakdown-item">
+                                    <span>🍛 Extra Dishes</span>
+                                    <strong>₹{price.extraItemsTotal.toLocaleString()}</strong>
+                                  </div>
+                                )}
+                                {price.waitersTotal > 0 && (
+                                  <div className="bk-price-preview__breakdown-item">
+                                    <span>🧑‍🍳 Extra Waiters</span>
+                                    <strong>₹{price.waitersTotal.toLocaleString()}</strong>
+                                  </div>
+                                )}
                                 <div className="bk-price-preview__breakdown-item">
                                   <span>✅ Advance (30%)</span>
                                   <strong>₹{Math.round(price.total * 0.3).toLocaleString()}</strong>
@@ -1560,12 +1710,24 @@ function Booking({ currentUser }) {
                           <p>{selectedPackage.extras}</p>
                         </div>
                       )}
+                      {extraItems.length > 0 && (
+                        <div className="bk-summary-menu-row bk-summary-menu-row--gold">
+                          <span className="bk-summary-menu-label">🍛 Extra Dishes Added</span>
+                          <p>{extraItems.map((i) => `${i.name} (₹${i.pricePerPerson}/plate)`).join(', ')}</p>
+                        </div>
+                      )}
+                      {parseInt(extraWaiters) > 0 && (
+                        <div className="bk-summary-menu-row bk-summary-menu-row--gold">
+                          <span className="bk-summary-menu-label">🧑‍🍳 Extra Waiters</span>
+                          <p>{extraWaiters} × ₹{EXTRA_WAITER_PRICE} = ₹{(parseInt(extraWaiters) * EXTRA_WAITER_PRICE).toLocaleString()}</p>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
               </section>
 
-              {/* Price Summary — conditional logic UNCHANGED */}
+              {/* Price Summary */}
               {price && (
                 <section className="bk-price-summary" aria-labelledby="sum-price">
                   <h3 id="sum-price" className="bk-price-summary__heading">
@@ -1579,6 +1741,34 @@ function Booking({ currentUser }) {
                     <span>₹{price.total.toLocaleString()}</span>
                   </div>
                   <div className="bk-price-summary__breakdown">
+                    <div className="bk-price-summary__row">
+                      <div>
+                        <div className="bk-price-summary__row-label">📦 Package Amount</div>
+                      </div>
+                      <strong className="bk-price-summary__row-amount bk-price-summary__row-amount--muted">
+                        ₹{price.packageTotal.toLocaleString()}
+                      </strong>
+                    </div>
+                    {price.extraItemsTotal > 0 && (
+                      <div className="bk-price-summary__row">
+                        <div>
+                          <div className="bk-price-summary__row-label">🍛 Extra Dishes</div>
+                        </div>
+                        <strong className="bk-price-summary__row-amount bk-price-summary__row-amount--muted">
+                          ₹{price.extraItemsTotal.toLocaleString()}
+                        </strong>
+                      </div>
+                    )}
+                    {price.waitersTotal > 0 && (
+                      <div className="bk-price-summary__row">
+                        <div>
+                          <div className="bk-price-summary__row-label">🧑‍🍳 Extra Waiters</div>
+                        </div>
+                        <strong className="bk-price-summary__row-amount bk-price-summary__row-amount--muted">
+                          ₹{price.waitersTotal.toLocaleString()}
+                        </strong>
+                      </div>
+                    )}
                     <div className="bk-price-summary__row bk-price-summary__row--advance">
                       <div>
                         <div className="bk-price-summary__row-label">✅ Pay Now (30% Advance)</div>

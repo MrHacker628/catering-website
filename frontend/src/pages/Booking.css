@@ -751,6 +751,99 @@
 }
 .bk-price-preview__breakdown-item strong { color: var(--bk-white); }
 
+/* Extra dishes + extra waiters add-ons */
+.bk-extras-block {
+  background: var(--bk-white);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  border-left: 3px solid var(--bk-bright);
+  margin-bottom: 14px;
+}
+
+.bk-extras-block__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bk-deep);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.bk-extras-picker-row {
+  display: flex;
+  gap: 8px;
+}
+
+.bk-extras-picker-row select {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--bk-light);
+  font-size: 13px;
+}
+
+.bk-extras-add-btn {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--bk-deep);
+  color: var(--bk-white);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bk-extras-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bk-extras-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--bk-muted);
+  background: var(--bk-pale);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.bk-extras-list__remove {
+  border: none;
+  background: none;
+  color: #c0392b;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.bk-waiters-field {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bk-waiters-field input {
+  width: 90px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--bk-light);
+  font-size: 13px;
+}
+
+.bk-waiters-field span {
+  font-size: 12px;
+  color: var(--bk-mid);
+}
+
 /* ══════════════════════════════════════════════
    BUTTONS
 ══════════════════════════════════════════════ */
