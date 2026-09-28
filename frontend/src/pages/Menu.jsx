@@ -394,6 +394,7 @@ const FALLBACK_IMG = 'https://images.unsplash.com/photo-1555244162-803834f70033?
 const CATEGORY_ICONS = {
   'All': '🍽️',
   'Welcome Drink': '🥂',
+  'Soft Beverages': '🥤',
   'Veg Starters': '🥗',
   'Chaat': '🫙',
   'Salads': '🥙',
@@ -426,6 +427,7 @@ function Menu() {
   const categories = [
     'All',
     'Welcome Drink',
+    'Soft Beverages',
     'Veg Starters',
     'Chaat',
     'Salads',

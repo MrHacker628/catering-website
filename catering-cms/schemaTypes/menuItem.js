@@ -3,6 +3,7 @@ import {defineField, defineType} from 'sanity'
 // Keep in sync with the category filter list in frontend/src/pages/Menu.jsx
 const CATEGORIES = [
   'Welcome Drink',
+  'Soft Beverages',
   'Veg Starters',
   'Chaat',
   'Salads',

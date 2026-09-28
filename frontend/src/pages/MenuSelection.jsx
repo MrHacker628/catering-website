@@ -357,7 +357,7 @@ import './MenuSelection.css';
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1555244162-803834f70033?w=400';
 
 const CATEGORIES = [
-  'All', 'Welcome Drink', 'Veg Starters', 'Dry Items',
+  'All', 'Welcome Drink', 'Soft Beverages', 'Veg Starters', 'Dry Items',
   'Veg Gravy', 'Non-Veg Gravy', 'Rice', 'Veg Rice',
   'Breads', 'Salads', 'Chaat', 'Dessert', 'Live Counters', 'Paan'
 ];

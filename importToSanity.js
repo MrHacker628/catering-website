@@ -33,6 +33,7 @@ const DEFAULT_PRICE_BY_CATEGORY = {
   'Breads': 40,
   'Salads': 90,
   'Welcome Drink': 60,
+  'Soft Beverages': 50,
   'Chaat': 100,
   'Live Counters': 250,
   'Paan': 50,
