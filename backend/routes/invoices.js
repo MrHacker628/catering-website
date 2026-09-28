@@ -8,21 +8,49 @@
 const express    = require('express');
 const router     = express.Router();
 const PDFDocument = require('pdfkit');      // generates the PDF
-const nodemailer = require('nodemailer');   // sends the email
 const db         = require('../db');        // MySQL connection
 
 
 // =============================================
-// EMAIL TRANSPORTER SETUP
-// Uses Gmail SMTP — credentials from .env file
+// EMAIL SENDING — via Brevo's HTTPS API
+// Render's free tier blocks outbound SMTP (raw
+// TCP on port 465/587), so we send email over
+// plain HTTPS instead using Brevo's transactional
+// email API. Credentials come from .env:
+//   BREVO_API_KEY      — API key from Brevo dashboard
+//   BREVO_SENDER_EMAIL — the single-sender email you verified in Brevo
 // =============================================
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,   // your gmail eg: mannatcaterersgoa@gmail.com
-        pass: process.env.EMAIL_PASS,   // gmail app password (NOT your normal password)
+async function sendBrevoEmail({ to, toName, subject, text, html, attachments }) {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+            'api-key': process.env.BREVO_API_KEY,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            sender: {
+                name: 'Mannat Caterers',
+                email: process.env.BREVO_SENDER_EMAIL,
+            },
+            to: [{ email: to, name: toName }],
+            subject,
+            textContent: text,
+            htmlContent: html,
+            attachment: (attachments || []).map(a => ({
+                name: a.filename,
+                content: a.content.toString('base64'),
+            })),
+        }),
+    });
+
+    if (!response.ok) {
+        const errBody = await response.text();
+        throw new Error(`Brevo API error (${response.status}): ${errBody}`);
     }
-});
+
+    return response.json();
+}
 
 
 // =============================================
@@ -100,8 +128,8 @@ router.post('/send', async function (req, res) {
         // STEP 2 — Send email with PDF attached
         // =============================================
         const mailOptions = {
-            from:    `"Mannat Caterers" <${process.env.EMAIL_USER}>`,
             to:      customerEmail,
+            toName:  customerName,
             subject: `✅ Booking Confirmed — Mannat Caterers | Order #${orderId}`,
 
             // Plain text version (for email clients that don't support HTML)
@@ -199,7 +227,7 @@ router.post('/send', async function (req, res) {
         };
 
         // Actually send the email
-        await transporter.sendMail(mailOptions);
+        await sendBrevoEmail(mailOptions);
         console.log(`✅ Invoice email sent to: ${customerEmail}`);
 
         res.status(200).json({
