@@ -23,7 +23,7 @@ function Payment() {
   const {
     orderId,
     customerId,
-    amount,          // 30% advance amount
+    amount,          // flat advance amount
     totalAmount,
     customerName,
   } = location.state || {};
@@ -254,7 +254,7 @@ function Payment() {
             <strong>₹{Number(totalAmount).toLocaleString()}</strong>
           </div>
           <div className="payment-row payment-row--highlight">
-            <span>Advance to Pay Now (30%)</span>
+            <span>Advance to Pay Now</span>
             <strong>₹{Number(amount).toLocaleString()}</strong>
           </div>
           <div className="payment-row">

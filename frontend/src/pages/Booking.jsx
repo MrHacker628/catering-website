@@ -676,6 +676,7 @@ import { API_BASE_URL } from '../apiConfig';
 import { client } from '../sanityClient';
 
 const EXTRA_WAITER_PRICE = 800;
+const FLAT_ADVANCE_AMOUNT = 10000; // flat advance for every booking, regardless of bill size
 
 function Booking({ currentUser }) {
 
@@ -798,13 +799,17 @@ function Booking({ currentUser }) {
   // rate applies below 600 guests, and the 600-guest rate applies at 600+.
   function getPrice() {
     if (customMenuData) {
+      const total = customMenuData.totalCost;
+      const advance = Math.min(FLAT_ADVANCE_AMOUNT, total);
       return {
-        total: customMenuData.totalCost,
-        perPlate: Math.round(customMenuData.totalCost / customMenuData.numPeople),
+        total,
+        perPlate: Math.round(total / customMenuData.numPeople),
         guests: customMenuData.numPeople,
-        packageTotal: customMenuData.totalCost,
+        packageTotal: total,
         extraItemsTotal: 0,
         waitersTotal: 0,
+        advance,
+        balance: total - advance,
       };
     }
     if (!selectedPackage || !eventData.num_of_guests) return null;
@@ -818,14 +823,18 @@ function Booking({ currentUser }) {
       return sum + item.pricePerPerson * guests;
     }, 0);
     const waitersTotal = (parseInt(extraWaiters) || 0) * EXTRA_WAITER_PRICE;
+    const total = packageTotal + extraItemsTotal + waitersTotal;
+    const advance = Math.min(FLAT_ADVANCE_AMOUNT, total);
 
     return {
-      total: packageTotal + extraItemsTotal + waitersTotal,
+      total,
       perPlate,
       guests,
       packageTotal,
       extraItemsTotal,
       waitersTotal,
+      advance,
+      balance: total - advance,
     };
   }
 
@@ -933,7 +942,7 @@ function Booking({ currentUser }) {
           package_id: customMenuData ? null : selectedPackage.id,
           is_custom_menu: customMenuData ? 1 : 0,
           total_amount: price.total,
-          advance_amount: Math.round(price.total * 0.3),
+          advance_amount: price.advance,
           extras_details: customMenuData ? null : JSON.stringify({
             extraItems: menuDetails.extraItems,
             extraWaiters: menuDetails.extraWaiters,
@@ -953,14 +962,14 @@ function Booking({ currentUser }) {
         packageName: customMenuData ? 'Custom Menu' : selectedPackage.package_name,
         menuDetails,
         totalAmount: price.total,
-        advanceAmount: Math.round(price.total * 0.3),
+        advanceAmount: price.advance,
       }));
 
       navigate('/payment', {
         state: {
           orderId: orderRes.data.orderId,
           customerId,
-          amount: Math.round(price.total * 0.3),
+          amount: price.advance,
           totalAmount: price.total,
           customerName: customerData.full_name,
         },
@@ -1548,12 +1557,12 @@ function Booking({ currentUser }) {
                                   </div>
                                 )}
                                 <div className="bk-price-preview__breakdown-item">
-                                  <span>✅ Advance (30%)</span>
-                                  <strong>₹{Math.round(price.total * 0.3).toLocaleString()}</strong>
+                                  <span>✅ Advance (Flat)</span>
+                                  <strong>₹{price.advance.toLocaleString()}</strong>
                                 </div>
                                 <div className="bk-price-preview__breakdown-item">
-                                  <span>📅 Balance (70%)</span>
-                                  <strong>₹{Math.round(price.total * 0.7).toLocaleString()}</strong>
+                                  <span>📅 Balance</span>
+                                  <strong>₹{price.balance.toLocaleString()}</strong>
                                 </div>
                               </div>
                             </div>
@@ -1771,19 +1780,19 @@ function Booking({ currentUser }) {
                     )}
                     <div className="bk-price-summary__row bk-price-summary__row--advance">
                       <div>
-                        <div className="bk-price-summary__row-label">✅ Pay Now (30% Advance)</div>
+                        <div className="bk-price-summary__row-label">✅ Pay Now (Flat Advance)</div>
                         <div className="bk-price-summary__row-sub">Secures your booking instantly</div>
                       </div>
                       <strong className="bk-price-summary__row-amount">
-                        ₹{Math.round(price.total * 0.3).toLocaleString()}
+                        ₹{price.advance.toLocaleString()}
                       </strong>
                     </div>
                     <div className="bk-price-summary__row">
                       <div>
-                        <div className="bk-price-summary__row-label">📅 Balance Due on Event Day (70%)</div>
+                        <div className="bk-price-summary__row-label">📅 Balance Due on Event Day</div>
                       </div>
                       <strong className="bk-price-summary__row-amount bk-price-summary__row-amount--muted">
-                        ₹{Math.round(price.total * 0.7).toLocaleString()}
+                        ₹{price.balance.toLocaleString()}
                       </strong>
                     </div>
                   </div>

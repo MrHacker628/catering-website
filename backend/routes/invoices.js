@@ -164,7 +164,7 @@ router.post('/send', async function (req, res) {
                                 <td style="padding: 8px 10px; border: 1px solid #ddd; font-weight: bold;">Rs. ${Number(totalAmount).toLocaleString('en-IN')}/-</td>
                             </tr>
                             <tr style="background: #fff3cd;">
-                                <td style="padding: 8px 10px; border: 1px solid #ddd; color: #666;">Advance Paid (30%)</td>
+                                <td style="padding: 8px 10px; border: 1px solid #ddd; color: #666;">Advance Paid</td>
                                 <td style="padding: 8px 10px; border: 1px solid #ddd; font-weight: bold; color: #28a745;">Rs. ${Number(advanceAmount).toLocaleString('en-IN')}/-</td>
                             </tr>
                             <tr style="background: #ffe0e0;">
@@ -455,9 +455,9 @@ function generateInvoicePDF(data) {
             }
         }
 
-        drawRow('TOTAL AMOUNT',                 `Rs. ${Number(data.totalAmount).toLocaleString('en-IN')}/-`,   LIGHT_GREY, false);
-        drawRow('ADVANCE PAID (30%)',            `Rs. ${Number(data.advanceAmount).toLocaleString('en-IN')}/-`, '#e8f5e9',  false);
-        drawRow('BALANCE DUE (On Event Day 70%)',`Rs. ${Number(data.balanceAmount).toLocaleString('en-IN')}/-`, '#ffeaea',  true);
+        drawRow('TOTAL AMOUNT',           `Rs. ${Number(data.totalAmount).toLocaleString('en-IN')}/-`,   LIGHT_GREY, false);
+        drawRow('ADVANCE PAID',           `Rs. ${Number(data.advanceAmount).toLocaleString('en-IN')}/-`, '#e8f5e9',  false);
+        drawRow('BALANCE DUE (On Event Day)', `Rs. ${Number(data.balanceAmount).toLocaleString('en-IN')}/-`, '#ffeaea',  true);
 
         y += 5;
 
@@ -483,7 +483,7 @@ function generateInvoicePDF(data) {
         y += 16;
 
         const terms = [
-            '1) Advance payment of 30% is required at the time of booking. Remaining balance of 70% must be paid on or before the Event day.',
+            '1) A flat advance payment of Rs. 10,000 is required at the time of booking. The remaining balance must be paid on or before the Event day.',
             '2) Payment method: All prices quoted are based on cash payments only. Online payments accepted (Google Pay / PhonePe).',
             '3) We require confirmation of numbers before 3 days of the event. We can accommodate up to 50 extra plates on actual charge.',
             '4) Alcoholic beverages: Mannat Caterers will never supply any form of alcoholic beverages for any event.',

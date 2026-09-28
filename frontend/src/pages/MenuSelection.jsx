@@ -750,9 +750,9 @@ function MenuSelection() {
                     <strong>₹{totalCost.toLocaleString()}</strong>
                   </div>
                   {totalCost > 0 && (
-                    <div className="bill-advance" aria-label={`Advance payment required: ₹${Math.round(totalCost * 0.3).toLocaleString()}`}>
-                      <span>Advance (30%)</span>
-                      <strong>₹{Math.round(totalCost * 0.3).toLocaleString()}</strong>
+                    <div className="bill-advance" aria-label={`Advance payment required: ₹${Math.min(10000, totalCost).toLocaleString()}`}>
+                      <span>Advance (Flat)</span>
+                      <strong>₹{Math.min(10000, totalCost).toLocaleString()}</strong>
                     </div>
                   )}
                 </div>
