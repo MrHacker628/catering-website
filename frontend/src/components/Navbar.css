@@ -72,7 +72,7 @@
 
 
 .navbar__logo-img {
-  height: 106px;
+  height: 64px;
   width: auto;
   object-fit: contain;
   /* Remove or comment out the filter line */
@@ -83,7 +83,7 @@
 /* On scroll — show colored logo */
 .navbar--scrolled .navbar__logo-img {
   filter: none;
-  height: 52px;
+  height: 48px;
 }
 
 /* ── NAV LINKS ── */
@@ -411,8 +411,8 @@
   .navbar__hamburger { display: flex; }
   .navbar__mobile    { display: flex; }
 
-  .navbar__logo-img { height: 48px; }
-  .navbar--scrolled .navbar__logo-img { height: 44px; }
+  .navbar__logo-img { height: 44px; }
+  .navbar--scrolled .navbar__logo-img { height: 40px; }
 }
 
 @media (max-width: 480px) {
