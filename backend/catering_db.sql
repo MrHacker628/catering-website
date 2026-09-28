@@ -40,7 +40,6 @@ CREATE TABLE `customers` (
 
 LOCK TABLES `customers` WRITE;
 /*!40000 ALTER TABLE `customers` DISABLE KEYS */;
-INSERT INTO `customers` VALUES (1,'Abrar Shaikh','abushaikh0018@gmail.com','9699791068','Hno.32 G Takaband cuncolim sal','2026-03-01 18:14:00'),(2,'sam','samshaikh@gmail.com','9823148908','Hno.32 G margoa','2026-03-01 18:27:01'),(3,'saeil','saeili@gmail.com','1234569876','canacona','2026-03-02 04:47:35'),(4,'Saieel ','saieel@gmail.com','9764499100','Margao Goa','2026-03-02 05:09:40'),(5,'juju','juju@gamil.com','9823148908','panajim','2026-03-02 07:57:20'),(6,'Test Bro','test@gmail.com','9999999999','Test City','2026-04-11 06:39:09'),(7,'san','san@gmail.com','1234567891','','2026-04-15 15:11:22'),(8,'sam','sam@gmial.com','1234569871','','2026-04-15 18:28:38'),(9,'afu','afu@gmail.com','9823148908','','2026-04-18 13:53:35'),(10,'san','141917codgamer@gmail.com','9699791068','Hno.32 G Takaband cuncolim sal','2026-04-19 01:51:07');
 /*!40000 ALTER TABLE `customers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -142,7 +141,6 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (1,1,'Birthday','2026-05-02','GM HALL ',600,1,126000.00,37800.00,88200.00,'pending','2026-04-18 15:05:09',0),(2,1,'Corporate','2026-05-02','GM HALL ',500,1,115000.00,34500.00,80500.00,'pending','2026-04-18 15:13:55',0),(3,1,'Birthday','2026-05-07','Margao hall',500,1,115000.00,34500.00,80500.00,'pending','2026-04-18 15:25:21',0),(4,1,'Birthday','2026-05-05','cuncolim muncipal',500,1,115000.00,34500.00,80500.00,'pending','2026-04-18 15:32:06',0),(5,1,'Birthday','2026-05-02','swarna',500,2,125000.00,37500.00,87500.00,'pending','2026-04-18 15:43:41',0),(6,1,'Anniversary','2026-05-02','GM hall',500,2,125000.00,37500.00,87500.00,'pending','2026-04-18 16:28:37',0),(7,1,'Birthday','2026-05-01','GM hall',500,1,115000.00,34500.00,80500.00,'pending','2026-04-18 16:38:34',0),(8,10,'Birthday','2026-04-25','G. M. Celebration Hall, IDC, Canacona Industrial Estate, Canacona, Goa 403702, India',500,6,300000.00,90000.00,210000.00,'pending','2026-04-19 01:51:07',0),(9,1,'Wedding','2026-04-25','Green Amaze, Green Amaze, Gogol, Madgaon, Goa 403601, India',250,NULL,25000.00,7500.00,17500.00,'pending','2026-04-19 11:07:30',0),(10,1,'Wedding','2026-04-25','Green Amaze, Green Amaze, Gogol, Madgaon, Goa 403601, India',250,NULL,25000.00,7500.00,17500.00,'pending','2026-04-19 11:08:57',0),(11,1,'Birthday','2026-05-07','G. M. Celebration Hall, IDC, Canacona Industrial Estate, Canacona, Goa 403702, India',250,NULL,37500.00,11250.00,26250.00,'pending','2026-04-19 11:18:49',0),(12,1,'Corporate','2026-04-21','Green Avenue, Green Avenue, Amritsar, Punjab 143001, India',600,1,126000.00,37800.00,88200.00,'pending','2026-04-19 11:24:50',0),(13,1,'Wedding','2026-04-28','KGN HALL, 92WG+9H6, near Bethoda, Prabhu Nagar, Ponda, Betora, Goa 403401, India',600,1,126000.00,37800.00,88200.00,'pending','2026-04-19 15:31:48',0),(14,1,'Wedding','2026-04-28','Gulmohar Park, 9RRM+VX9, Airport Rd, Chicalim, Mormugao, Goa 403711, India',600,1,126000.00,37800.00,88200.00,'pending','2026-04-19 15:36:48',0),(15,1,'Anniversary','2026-05-19','G. M. Celebration Hall, IDC, Canacona Industrial Estate, Canacona, Goa 403702, India',300,NULL,45000.00,13500.00,31500.00,'pending','2026-04-19 16:13:34',0),(16,1,'Wedding','2026-05-09','G. M. Celebration Hall, IDC, Canacona Industrial Estate, Canacona, Goa 403702, India',400,NULL,40000.00,12000.00,28000.00,'pending','2026-04-19 16:16:36',0),(17,1,'Corporate','2026-04-22','KGN HALL, 92WG+9H6, near Bethoda, Prabhu Nagar, Ponda, Betora, Goa 403401, India',500,3,130000.00,39000.00,91000.00,'pending','2026-04-19 16:52:11',0);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -214,7 +212,6 @@ CREATE TABLE `payments` (
 
 LOCK TABLES `payments` WRITE;
 /*!40000 ALTER TABLE `payments` DISABLE KEYS */;
-INSERT INTO `payments` VALUES (1,4,1,'order_Sf0QDYXeiBADrt',NULL,3450000.00,'pending','2026-04-18 15:32:08'),(2,5,1,'order_Sf0cS2lxpcEKgG',NULL,3750000.00,'pending','2026-04-18 15:43:43'),(3,6,1,'order_Sf1Nv443tFDlol',NULL,3750000.00,'pending','2026-04-18 16:28:39'),(4,7,1,'order_Sf1YPpYdFP93cQ',NULL,3450000.00,'pending','2026-04-18 16:38:35'),(5,8,10,'order_SfAy8m1YLbb1wK',NULL,9000000.00,'pending','2026-04-19 01:51:10'),(6,10,1,'order_SfKTOinAULw4CD',NULL,750000.00,'pending','2026-04-19 11:09:00'),(7,11,1,'order_SfKdqyqPICEUS6',NULL,1125000.00,'pending','2026-04-19 11:18:54'),(8,12,1,'order_SfKk9FP5GW1TQp',NULL,3780000.00,'pending','2026-04-19 11:24:51'),(9,13,1,'order_SfOx12KxBlMg36',NULL,3780000.00,'pending','2026-04-19 15:31:49'),(10,14,1,'order_SfP2JLhjVvBCNK',NULL,3780000.00,'pending','2026-04-19 15:36:50'),(11,15,1,'order_SfPh0bKUzBiMt5',NULL,1350000.00,'pending','2026-04-19 16:15:21'),(12,16,1,'order_SfPiL5vUPHQBWt',NULL,1200000.00,'pending','2026-04-19 16:16:37'),(13,17,1,'order_SfQJvxDN6QE0bp',NULL,3900000.00,'pending','2026-04-19 16:52:12');
 /*!40000 ALTER TABLE `payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -244,7 +241,6 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'roshel','roshel@gmail.com','78451223','','$2b$10$laqX19xhxsU4H62s.90rE.hkOD1Yoh0U3Md3VwQIT0ph5RLumr4TK','2026-03-09 01:09:39'),(2,'Abrar Shaikh','abushaikh0018@gmail.com','9823148908','Hno.32 G Takaband cuncolim sal','$2b$10$TciIY0LdInP1eHU0sk1ozOg8GADxK0UXKTKTFPyjA9VROa99J8x62','2026-03-11 04:39:18'),(3,'san','san@gmail.com','1234567891','','$2b$10$ut5XtsMtMx2cUlwLpnPKWO3YwgLX/eI0BTRjmcOCinJjNiaaRDF2.','2026-03-29 12:18:23'),(4,'sam','sam@gmial.com','1234569871','','$2b$10$0gp8v3o1HnHX6dYmjCzC4ulWg/8tv6B0/cFhv1IStxEc/ZLFbvyMO','2026-04-15 18:28:12'),(5,'afu','afu@gmail.com','99999999','','$2b$10$Qou71q29bd7PqDl6zTQTT.WR6W.QMECXoOLHwTpuGjO8L/KxUWCKG','2026-04-18 13:52:47');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
